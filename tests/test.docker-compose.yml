@@ -1,0 +1,17 @@
+services:
+  ws:
+    container_name: ws
+    build:
+      context: ../.
+
+    volumes:
+      - ../.:/app
+
+    env_file:
+      - .env.test
+
+    command: >
+      sh -c "uvicorn src.presentation.ws.main:app_factory --host 0.0.0.0 --port 8002 --reload"
+
+    ports:
+      - "8002:8002"
