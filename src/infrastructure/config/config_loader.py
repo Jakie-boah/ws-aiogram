@@ -13,4 +13,5 @@ def load_config_from_env() -> Config:
 def _create_config() -> Config:
     return Config(
         bot_token=os.environ["BOT_TOKEN"],
+        tg_chat_id=os.environ["TG_CHAT_ID"],
     )

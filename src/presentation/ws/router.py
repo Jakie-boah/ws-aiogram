@@ -1,11 +1,13 @@
-import structlog
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from dishka.integrations.fastapi import FromDishka, inject
 from uuid import uuid4
+
+import structlog
+from dishka.integrations.fastapi import FromDishka, inject
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
 
 from src.application.interfaces.ws.connection_manager import ConnectionManager
 from src.presentation.ws.html_base import html
-from fastapi.responses import HTMLResponse
+
 
 router = APIRouter(prefix="")
 
@@ -18,7 +20,7 @@ async def get(logger: FromDishka[structlog.BoundLogger], session_id: str | None 
     logger.info(session_id)
 
     html_with_id = html.replace(
-        "Your ID: <span id=\"ws-id\"></span>",
+        'Your ID: <span id="ws-id"></span>',
         f'Your ID: <span id="ws-id">{session_id}</span>'
     )
 

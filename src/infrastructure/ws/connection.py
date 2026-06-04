@@ -1,6 +1,8 @@
-from src.application.interfaces.ws.connection_manager import ConnectionManager
-from fastapi import WebSocket
 from collections import defaultdict
+
+from fastapi import WebSocket
+
+from src.application.interfaces.ws.connection_manager import ConnectionManager
 
 
 class ImplConnectionManager(ConnectionManager):

@@ -1,20 +1,17 @@
 import asyncio
-import logging
+
 import structlog
-import sys
 from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+from dishka import make_async_container
+from dishka.integrations.aiogram import FromDishka, setup_dishka
 
 from src.infrastructure.config.config_loader import load_config_from_env
-from dishka.integrations.aiogram import (
-    setup_dishka, FromDishka
-)
-from dishka import make_async_container
-
 from src.infrastructure.ioc_container import LoggerProvider
+
 
 dp = Dispatcher()
 
@@ -35,7 +32,7 @@ async def echo_handler(message: Message, logger: FromDishka[structlog.BoundLogge
 
 async def main() -> None:
     config = load_config_from_env()
-    container = make_async_container(LoggerProvider(), )
+    container = make_async_container(LoggerProvider() )
 
     bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
