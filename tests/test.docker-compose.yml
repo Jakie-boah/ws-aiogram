@@ -15,3 +15,16 @@ services:
 
     ports:
       - "8002:8002"
+
+  bot:
+    container_name: bot
+    build:
+      context: ../.
+
+    volumes:
+      - ../.:/app
+
+    env_file:
+      - .env.test
+    command: >
+      sh -c "uv run python -m src.presentation.tg.main"
