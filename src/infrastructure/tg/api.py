@@ -1,7 +1,7 @@
 from aiohttp import ClientSession
 
 from src.application.interfaces.tg.api import TgAPI
-from src.domain.values import Text
+from src.domain.values import Text, MessageId
 
 
 class ImplTgAPI(TgAPI):
@@ -17,7 +17,7 @@ class ImplTgAPI(TgAPI):
         self.__chat_id = chat_id
         self.__bot_token = bot_token
 
-    async def send_message(self, text: Text):
+    async def send_message(self, text: Text) -> MessageId:
         url = self.url.format(bot_token=self.__bot_token) + "/sendMessage"
 
         payload = {
@@ -28,4 +28,5 @@ class ImplTgAPI(TgAPI):
 
         async with self.http_session.post(url, json=payload) as response:
             response.raise_for_status()
-            return await response.json()
+            response = await response.json()
+            return MessageId(response["result"]["message_id"])
