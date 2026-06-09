@@ -1,7 +1,7 @@
 from dishka import make_async_container
 
 from src.infrastructure.config.config_storage import Config
-from src.infrastructure.ioc_container import AioHttpProvider, LoggerProvider, TgProvider, WSProvider
+from src.infrastructure.ioc_container import AioHttpProvider, LoggerProvider, RedisProvider, TgProvider, WSProvider
 
 
 def create_container(config: Config):
@@ -10,5 +10,6 @@ def create_container(config: Config):
         WSProvider(),
         TgProvider(),
         AioHttpProvider(),
+        RedisProvider(),
         context={Config: config},
     )

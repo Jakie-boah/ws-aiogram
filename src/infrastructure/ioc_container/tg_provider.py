@@ -1,10 +1,9 @@
-from dishka import Provider, Scope, provide, from_context
+from aiohttp import ClientSession
+from dishka import Provider, Scope, from_context, provide
 
 from src.application.interfaces.tg.api import TgAPI
-from src.infrastructure.tg.api import ImplTgAPI
-
 from src.infrastructure.config.config_storage import Config
-from aiohttp import ClientSession
+from src.infrastructure.tg.api import ImplTgAPI
 
 
 class TgProvider(Provider):

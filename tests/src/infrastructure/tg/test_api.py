@@ -10,6 +10,7 @@ async def tg_api(container) -> TgAPI:
 
 
 @pytest.mark.asyncio
-async def test_send_message(tg_api):
+async def test_send_message(tg_api, logger):
     result = await tg_api.send_message(text=Text("Hello, from text"))
+    logger.info(result)
     assert result["ok"] is True

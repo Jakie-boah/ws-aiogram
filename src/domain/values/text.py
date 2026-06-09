@@ -1,5 +1,7 @@
-from src.domain.values.base import BaseValueObject
 from dataclasses import dataclass
+
+from src.domain.errors import TextValidationError
+from src.domain.values.base import BaseValueObject
 
 
 @dataclass(frozen=True, slots=True)
@@ -8,4 +10,4 @@ class Text(BaseValueObject):
 
     def validate(self):
         if not self.value.strip():
-            raise ValueError("Text cannot be empty")
+            raise TextValidationError(field="text", message="Cannot be empty")

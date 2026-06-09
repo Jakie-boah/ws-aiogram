@@ -29,6 +29,12 @@ services:
     command: >
       sh -c "uv run python -m src.presentation.tg.main"
   
+  test-redis:
+    container_name: test-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
 
   tests:
     container_name: tests
