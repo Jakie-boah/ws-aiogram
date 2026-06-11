@@ -1,8 +1,9 @@
 import structlog
-from src.domain.values import UserId, Text
-from src.application.interfaces.tg.api import TgAPI
+
 from src.application.dto.client_message import ClientMessage
 from src.application.interfaces.redis.storage import RedisStorage
+from src.application.interfaces.tg.api import TgAPI
+from src.domain.values import Text, UserId
 
 
 class ClientMessageUseCase:

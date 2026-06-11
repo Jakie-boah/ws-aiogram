@@ -14,5 +14,6 @@ def _create_config() -> Config:
     return Config(
         bot_token=os.environ["BOT_TOKEN"],
         tg_chat_id=int(os.environ["TG_CHAT_ID"]),
-        redis=os.environ["REDIS"]
+        redis=os.environ["REDIS"],
+        rabbit=os.environ["RABBIT"],
     )

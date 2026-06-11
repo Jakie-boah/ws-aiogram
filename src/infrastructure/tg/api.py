@@ -1,7 +1,7 @@
 from aiohttp import ClientSession
 
 from src.application.interfaces.tg.api import TgAPI
-from src.domain.values import Text, MessageId
+from src.domain.values import MessageId, Text
 
 
 class ImplTgAPI(TgAPI):

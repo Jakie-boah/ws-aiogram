@@ -1,6 +1,6 @@
 services:
-  ws:
-    container_name: ws
+  test-ws:
+    container_name: test-ws
     build:
       context: ../.
 
@@ -16,8 +16,8 @@ services:
     ports:
       - "8002:8002"
 
-  bot:
-    container_name: bot
+  test-bot:
+    container_name: test-bot
     build:
       context: ../.
 
@@ -36,6 +36,26 @@ services:
       - "6379:6379"
 
 
+
+  test-amqp-api:
+    container_name: test-amqp-api
+    build:
+      context: ../.
+
+    volumes:
+      - ../.:/app
+    env_file:
+      - .env.test
+
+    command: sh -c "python src/presentation/amqp_api/main.py"
+
+    ports:
+      - "8003:8003"
+
+    depends_on:
+      test-rabbit:
+        condition: service_healthy
+
   tests:
     container_name: tests
     build:
@@ -48,3 +68,18 @@ services:
 
     command: >
       sh -c "uv run pytest tests/src/"
+  
+
+  test-rabbit:
+    image: rabbitmq:4.3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "status" ]
+      interval: 5s
+      retries: 5
+      timeout: 5s

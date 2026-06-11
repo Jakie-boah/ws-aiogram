@@ -6,3 +6,4 @@ class Config:
     bot_token: str
     tg_chat_id: int
     redis: str
+    rabbit: str

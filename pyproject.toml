@@ -12,6 +12,7 @@ dependencies = [
     "dishka>=1.10.1",
     "faker>=40.21.0",
     "fastapi>=0.136.3",
+    "faststream[rabbit]==0.6.7",
     "pytest-cov>=7.1.0",
     "python-dotenv>=1.2.2",
     "redis>=8.0.0",
