@@ -4,4 +4,4 @@ from src.application.use_cases.client_message_use_case import ClientMessageUseCa
 
 
 class UseCasesProvider(Provider):
-    client_message_use_case = provide(ClientMessageUseCase, scope=Scope.REQUEST)
+    client_message_use_case = provide(ClientMessageUseCase, scope=Scope.SESSION)

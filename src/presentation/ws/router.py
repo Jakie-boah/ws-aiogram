@@ -1,3 +1,4 @@
+import random
 from uuid import uuid4
 
 import structlog
@@ -7,7 +8,8 @@ from fastapi.responses import HTMLResponse
 
 from src.application.interfaces.ws.connection_manager import ConnectionManager
 from src.presentation.ws.html_base import html
-
+from src.application.use_cases.client_message_use_case import ClientMessageUseCase
+from src.application.dto.client_message import ClientMessage
 
 router = APIRouter(prefix="")
 
@@ -41,30 +43,33 @@ async def get(logger: FromDishka[structlog.BoundLogger], session_id: str | None 
 async def websocket_endpoint(
         logger: FromDishka[structlog.BoundLogger],
         websocket: WebSocket,
-        manager: FromDishka[ConnectionManager]
+        manager: FromDishka[ConnectionManager],
+        use_case: FromDishka[ClientMessageUseCase],
 ):
     logger.info(f"websocket.cookies.get(session_id) - {websocket.cookies.get("session_id")}")
-    session_id = websocket.cookies.get("session_id")
+    
+    user_id = websocket.cookies.get("user_id", random.randint(1, 100))
 
-    if not session_id:
+    if not user_id:
         logger.info("close")
         await websocket.close(code=1008)
         return
 
-    logger.info(session_id)
-
-    logger.info(f"алоооо - {session_id}")
-
-    await manager.connect(session_id, websocket)
+    await manager.connect(user_id, websocket)
 
     try:
         while True:
             data = await websocket.receive_text()
 
+            payload = ClientMessage(
+                text=data,
+                user_id=user_id,
+            )
+
             logger.info(manager.active_connections)
 
-            await manager.send_personal_message(session_id, f"You wrote: {data}")
+            await use_case(payload)
 
     except WebSocketDisconnect:
-        logger.info(f"Client #{session_id} left the chat")
-        manager.disconnect(session_id, websocket)
+        logger.info(f"Client #{user_id} left the chat")
+        manager.disconnect(user_id, websocket)
