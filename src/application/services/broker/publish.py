@@ -1,8 +1,10 @@
+from dataclasses import asdict
+
 import structlog
 from faststream.rabbit import RabbitBroker
-from src.application.dto.client_message import ClientMessage
 
-from dataclasses import asdict
+from src.application.dto.admin_message import AdminReply
+from src.application.dto.client_message import ClientMessage
 
 
 class PublisherService:
@@ -16,5 +18,8 @@ class PublisherService:
             exchange="chat", routing_key="client_message",
         )
 
-    async def publish_admin_message(self):
-        pass
+    async def publish_admin_message(self, payload: AdminReply):
+        await self.rabbit.publish(
+            message=asdict(payload),
+            exchange="chat", routing_key="admin_message",
+        )

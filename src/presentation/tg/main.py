@@ -1,16 +1,17 @@
 import asyncio
 
-import structlog
-from aiogram import Bot, Dispatcher, html
+from aiogram import Bot, Dispatcher, F, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from dishka import make_async_container
-from dishka.integrations.aiogram import FromDishka, setup_dishka
+from dishka.integrations.aiogram import FromDishka, inject, setup_dishka
 
+from src.application.dto.admin_message import AdminMessage
+from src.application.use_cases.admin_message_use_case import AdminMessageUseCase
+from src.domain.values import MessageId, Text
 from src.infrastructure.config.config_loader import load_config_from_env
-from src.infrastructure.ioc_container import LoggerProvider
+from src.presentation.dependency_container import create_container
 
 
 dp = Dispatcher()
@@ -21,22 +22,25 @@ async def command_start_handler(message: Message) -> None:
     await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
 
 
-@dp.message()
-async def echo_handler(message: Message, logger: FromDishka[structlog.BoundLogger]) -> None:
-    try:
-        logger.info(message.chat.id)
-        await message.answer(message.text)
-    except TypeError:
-        await message.answer("Nice try!")
+@dp.message(F.reply_to_message)
+@inject
+async def admin_message(
+        message: Message,
+        use_case: FromDishka[AdminMessageUseCase]
+) -> None:
+    payload = AdminMessage(
+        text=Text(message.text),
+        client_message_id=MessageId(message.reply_to_message.message_id)
+    )
+    await use_case(payload)
 
 
 async def main() -> None:
     config = load_config_from_env()
-    container = make_async_container(LoggerProvider() )
 
     bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    setup_dishka(container=container, router=dp, auto_inject=True)
+    setup_dishka(container=create_container(config), router=dp, auto_inject=True)
 
     await dp.start_polling(bot)
 

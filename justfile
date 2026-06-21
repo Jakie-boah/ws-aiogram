@@ -12,6 +12,10 @@ test-rebuild:
   {{TEST_DOCKER_COMPOSE}} up -d --build && docker logs -f tests
 
 
+test-restart:
+  {{ TEST_DOCKER_COMPOSE }} down && {{TEST_DOCKER_COMPOSE}} up -d
+
+
 test-down:
   {{TEST_DOCKER_COMPOSE}} down
 

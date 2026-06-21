@@ -1,11 +1,10 @@
+from collections.abc import AsyncIterable
+
 from dishka import Provider, Scope, from_context, provide
 from faststream.rabbit import RabbitBroker
 
-from src.infrastructure.config.config_storage import Config
-
 from src.application.services.broker.publish import PublisherService
-
-from typing import AsyncIterable
+from src.infrastructure.config.config_storage import Config
 
 
 class RabbitProvider(Provider):

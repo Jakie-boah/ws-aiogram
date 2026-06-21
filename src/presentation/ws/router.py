@@ -11,7 +11,6 @@ from src.application.interfaces.ws.connection_manager import ConnectionManager
 from src.application.use_cases.client_message_use_case import ClientMessageUseCase
 from src.presentation.ws.html_base import html
 
-from src.application.services.broker.publish import PublisherService
 
 router = APIRouter(prefix="")
 
@@ -46,8 +45,7 @@ async def websocket_endpoint(
         logger: FromDishka[structlog.BoundLogger],
         websocket: WebSocket,
         manager: FromDishka[ConnectionManager],
-        # use_case: FromDishka[ClientMessageUseCase],
-        broker_publisher: FromDishka[PublisherService]
+        use_case: FromDishka[ClientMessageUseCase],
 ):
     logger.info(f"websocket.cookies.get(session_id) - {websocket.cookies.get("session_id")}")
 
@@ -71,7 +69,7 @@ async def websocket_endpoint(
 
             logger.info(manager.active_connections)
 
-            await broker_publisher.publish_client_message(payload)
+            await use_case(payload)
 
     except WebSocketDisconnect:
         logger.info(f"Client #{user_id} left the chat")
