@@ -1,3 +1,4 @@
+from dishka import FromDishka
 from dishka.integrations.faststream import inject
 from faststream.rabbit import (
     ExchangeType,
@@ -6,9 +7,10 @@ from faststream.rabbit import (
     RabbitRouter,
 )
 from faststream.rabbit.schemas import Channel
+
 from src.application.dto.client_message import ClientMessage
 from src.application.use_cases.client_message_use_case import ClientMessageUseCase
-from dishka import FromDishka
+
 
 exchange = RabbitExchange("chat", durable=True, type=ExchangeType.DIRECT)
 

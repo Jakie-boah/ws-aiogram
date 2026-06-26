@@ -1,11 +1,11 @@
+from collections.abc import AsyncIterable
+
 from dishka import Provider, Scope, from_context, provide
 from faststream.rabbit import RabbitBroker
 
+from src.application.interfaces.broker.publisher import BrokerPublisher
+from src.infrastructure.broker.publisher import ImplBrokerPublisher
 from src.infrastructure.config.config_storage import Config
-
-from src.application.services.broker.publish import PublisherService
-
-from typing import AsyncIterable
 
 
 class RabbitProvider(Provider):
@@ -16,6 +16,6 @@ class RabbitProvider(Provider):
         rabbit = RabbitBroker(config.rabbit)
         await rabbit.connect()
         yield rabbit
-        await rabbit.close()
+        await rabbit.stop()
 
-    publisher_service = provide(PublisherService, scope=Scope.SESSION)
+    broker_publisher = provide(ImplBrokerPublisher, scope=Scope.SESSION, provides=BrokerPublisher)

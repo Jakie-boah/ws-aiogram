@@ -27,7 +27,7 @@ services:
     env_file:
       - .env.test
     command: >
-      sh -c "uv run python -m src.presentation.tg.main"
+      sh -c "uv run python -m src.presentation.bot.main"
   
   test-redis:
     container_name: test-redis
