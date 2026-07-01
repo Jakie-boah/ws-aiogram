@@ -2,7 +2,7 @@ from src.application.use_cases.client_message_use_case import ClientMessageUseCa
 
 import pytest
 import pytest_asyncio
-from src.application.dto.client_message import ClientMessage
+from src.domain.entities.client_message import ClientMessage
 
 
 @pytest_asyncio.fixture

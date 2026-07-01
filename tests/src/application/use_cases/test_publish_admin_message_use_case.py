@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 
 from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
-from src.application.dto.admin_message import AdminMessage
+from src.domain.entities.admin_message import AdminMessage
 from src.domain.values import MessageId, Text
 
 

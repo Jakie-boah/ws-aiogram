@@ -1,7 +1,7 @@
 import structlog
 
-from src.application.dto.admin_message import AdminMessage
 from src.application.interfaces.broker.publisher import BrokerPublisher
+from src.domain.entities.admin_message import AdminMessage
 
 
 class PublishAdminMessageUseCase:

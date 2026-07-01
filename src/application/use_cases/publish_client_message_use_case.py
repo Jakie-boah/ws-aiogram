@@ -1,6 +1,7 @@
 import structlog
+
 from src.application.interfaces.broker.publisher import BrokerPublisher
-from src.application.dto.client_message import ClientMessage
+from src.domain.entities.client_message import ClientMessage
 
 
 class PublishClientMessageUseCase:

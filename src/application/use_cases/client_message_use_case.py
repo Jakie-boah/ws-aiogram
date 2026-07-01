@@ -1,9 +1,9 @@
 import structlog
 
-from src.application.dto.client_message import ClientMessage
+from src.application.dto.client_message import ClientMessageDTO
 from src.application.interfaces.redis.storage import RedisStorage
 from src.application.interfaces.tg.api import TgAPI
-from src.domain.values import Text, UserId
+from src.domain.mapper import map_client_message_from_dto
 
 
 class ClientMessageUseCase:
@@ -17,6 +17,8 @@ class ClientMessageUseCase:
         self.tg_api = tg_api
         self.storage = redis_storage
 
-    async def __call__(self, payload: ClientMessage):
-        message_id = await self.tg_api.send_message(payload.text)
-        await self.storage.set(message_id, payload.user_id)
+    async def __call__(self, payload: ClientMessageDTO):
+        client_message = map_client_message_from_dto(payload)
+
+        message_id = await self.tg_api.send_message(client_message.text)
+        await self.storage.set(message_id, client_message.user_id)

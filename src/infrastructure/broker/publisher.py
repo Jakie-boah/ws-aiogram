@@ -1,8 +1,9 @@
 import structlog
 from faststream.rabbit import RabbitBroker
 
-from src.application.dto.client_message import ClientMessage
 from src.application.interfaces.broker.publisher import BrokerPublisher
+from src.domain.entities.admin_message import AdminMessage
+from src.domain.entities.client_message import ClientMessage
 
 
 class ImplBrokerPublisher(BrokerPublisher):
@@ -18,11 +19,14 @@ class ImplBrokerPublisher(BrokerPublisher):
     def broker(self) -> RabbitBroker:
         return self._broker
 
-    async def publish_client_message(self, payload: ClientMessage):
+    async def publish_client_message(self, entity: ClientMessage):
         await self.broker.publish(
-            message=payload.as_dict(),
+            message=entity.as_dict(),
             exchange="chat", routing_key="client_message",
         )
 
-    async def publish_admin_message(self):
-        pass
+    async def publish_admin_message(self, entity: AdminMessage):
+        await self.broker.publish(
+            message=entity.as_dict(),
+            exchange="chat", routing_key="admin_message"
+        )

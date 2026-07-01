@@ -6,10 +6,11 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
-from src.application.dto.client_message import ClientMessage, ClientMessageDTO
+from src.application.dto.client_message import ClientMessageDTO
 from src.application.interfaces.ws.connection_manager import ConnectionManager
-from src.presentation.ws.html_base import html
 from src.application.use_cases.publish_client_message_use_case import PublishClientMessageUseCase
+from src.presentation.ws.html_base import html
+
 
 router = APIRouter(prefix="")
 
@@ -66,7 +67,7 @@ async def websocket_endpoint(
                 user_id=user_id,
             )
 
-            await use_case(ClientMessage.from_dto(payload))
+            await use_case(payload)
 
             logger.info(manager.active_connections)
 

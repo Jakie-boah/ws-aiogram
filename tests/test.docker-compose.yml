@@ -68,7 +68,10 @@ services:
 
     command: >
       sh -c "uv run pytest tests/src/"
-  
+
+    depends_on:
+      test-rabbit:
+        condition: service_healthy
 
   test-rabbit:
     image: rabbitmq:4.3-management
