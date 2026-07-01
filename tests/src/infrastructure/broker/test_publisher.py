@@ -3,6 +3,7 @@ import pytest_asyncio
 from faker import Faker
 
 from src.application.dto.client_message import ClientMessage
+from src.application.dto.admin_message import AdminMessage
 from src.application.interfaces.broker.publisher import BrokerPublisher
 
 fake = Faker()
@@ -20,3 +21,10 @@ async def test_publish_client_message(broker_publisher, logger):
         text="Hello from publisher test",
     )
     await broker_publisher.publish_client_message(payload)
+
+
+@pytest.mark.asyncio
+async def test_publish_admin_message(broker_publisher, logger):
+    payload = AdminMessage(
+
+    )

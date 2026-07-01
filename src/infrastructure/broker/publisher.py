@@ -1,5 +1,3 @@
-from dataclasses import asdict
-
 import structlog
 from faststream.rabbit import RabbitBroker
 
@@ -22,7 +20,7 @@ class ImplBrokerPublisher(BrokerPublisher):
 
     async def publish_client_message(self, payload: ClientMessage):
         await self.broker.publish(
-            message=asdict(payload),
+            message=payload.as_dict(),
             exchange="chat", routing_key="client_message",
         )
 

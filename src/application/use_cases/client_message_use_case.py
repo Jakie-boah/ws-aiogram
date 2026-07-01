@@ -18,8 +18,5 @@ class ClientMessageUseCase:
         self.storage = redis_storage
 
     async def __call__(self, payload: ClientMessage):
-        user_id = UserId(int(payload.user_id))
-        text = Text(payload.text)
-
-        message_id = await self.tg_api.send_message(text)
-        await self.storage.set(message_id, user_id)
+        message_id = await self.tg_api.send_message(payload.text)
+        await self.storage.set(message_id, payload.user_id)
