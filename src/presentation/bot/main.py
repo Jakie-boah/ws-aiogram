@@ -6,12 +6,16 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from dishka import make_async_container
-from dishka.integrations.aiogram import FromDishka, setup_dishka
 
+from dishka.integrations.aiogram import (
+    FromDishka,
+    inject,
+    setup_dishka,
+)
+from src.presentation.dependency_container import create_container
 from src.infrastructure.config.config_loader import load_config_from_env
-from src.infrastructure.ioc_container import LoggerProvider
-
+from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
+from src.application.dto.admin_message import AdminMessageDTO
 
 dp = Dispatcher()
 
@@ -22,20 +26,27 @@ async def command_start_handler(message: Message) -> None:
 
 
 @dp.message(F.reply_to_message)
-async def echo_handler(message: Message, logger: FromDishka[structlog.BoundLogger]) -> None:
+@inject
+async def echo_handler(
+        message: Message,
+        use_case: FromDishka[PublishAdminMessageUseCase],
+) -> None:
     try:
-        logger.info(message)
-
-        logger.info(message.chat.id)
-        logger.info(message.message_id)
         await message.answer(message.text)
+
+        payload = AdminMessageDTO(
+            message_id=message.reply_to_message.message_id,
+            text=message.text
+        )
+        await use_case(payload)
+
     except TypeError:
         await message.answer("Nice try!")
 
 
 async def main() -> None:
     config = load_config_from_env()
-    container = make_async_container(LoggerProvider())
+    container = create_container(config)
 
     bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 

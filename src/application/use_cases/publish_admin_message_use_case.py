@@ -2,6 +2,8 @@ import structlog
 
 from src.application.interfaces.broker.publisher import BrokerPublisher
 from src.domain.entities.admin_message import AdminMessage
+from src.domain.mapper import map_admin_message_from_dto
+from src.application.dto.admin_message import AdminMessageDTO
 
 
 class PublishAdminMessageUseCase:
@@ -13,5 +15,6 @@ class PublishAdminMessageUseCase:
         self._logger = logger
         self._broker_publish = broker_publisher
 
-    async def __call__(self, payload: AdminMessage):
-        await self._broker_publish.publish_admin_message(payload)
+    async def __call__(self, payload: AdminMessageDTO):
+        admin_message: AdminMessage = map_admin_message_from_dto(payload)
+        await self._broker_publish.publish_admin_message(admin_message)

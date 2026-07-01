@@ -3,7 +3,9 @@ import pytest_asyncio
 
 from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
 from src.domain.entities.admin_message import AdminMessage
-from src.domain.values import MessageId, Text
+from faker import Faker
+
+fake = Faker()
 
 
 @pytest_asyncio.fixture
@@ -12,9 +14,10 @@ async def use_case(container) -> PublishAdminMessageUseCase:
 
 
 @pytest.mark.asyncio
-async def test_use_case(use_case, mocker):
+async def test_use_case(use_case):
     admin_msg = AdminMessage(
-        message_id=MessageId(1),
-        text=Text("text")
+        message_id=fake.pyint(min_value=1, max_value=1000),
+        text=fake.text()
     )
+
     await use_case(admin_msg)
