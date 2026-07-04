@@ -11,7 +11,6 @@ from src.application.interfaces.ws.connection_manager import ConnectionManager
 from src.application.use_cases.publish_client_message_use_case import PublishClientMessageUseCase
 from src.presentation.ws.html_base import html
 
-
 router = APIRouter(prefix="")
 
 

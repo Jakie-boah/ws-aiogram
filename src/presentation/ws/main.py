@@ -3,7 +3,8 @@ from fastapi import FastAPI
 
 from src.infrastructure.config.config_loader import load_config_from_env
 from src.presentation.dependency_container import create_container
-from src.presentation.ws.router import router
+from src.presentation.ws.router import router as ws_router
+from src.presentation.ws.internal_router import router as internal_router
 
 
 def create_app() -> FastAPI:
@@ -13,7 +14,8 @@ def create_app() -> FastAPI:
     async def health():
         return {"status": "ok"}
 
-    app.include_router(router)
+    app.include_router(ws_router)
+    app.include_router(internal_router)
 
     return app
 

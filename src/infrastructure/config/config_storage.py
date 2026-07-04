@@ -7,3 +7,6 @@ class Config:
     tg_chat_id: int
     redis: str
     rabbit: str
+    internal_token: str
+    ws_host: str
+    ws_port: int

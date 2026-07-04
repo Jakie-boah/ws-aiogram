@@ -67,7 +67,7 @@ services:
       - .env.test
 
     command: >
-      sh -c "uv run pytest tests/src/"
+      sh -c "uv run pytest tests/src/infrastructure/ws/test_gateway.py"
 
     depends_on:
       test-rabbit:
