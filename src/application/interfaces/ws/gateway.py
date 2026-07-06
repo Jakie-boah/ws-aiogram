@@ -1,5 +1,6 @@
 from typing import Protocol
-from src.domain.values import UserId, Text
+
+from src.domain.values import Text, UserId
 
 
 class WSGatewayAPI(Protocol):

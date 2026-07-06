@@ -1,4 +1,3 @@
-import structlog
 from dishka import FromDishka
 from dishka.integrations.faststream import inject
 from faststream.rabbit import (
@@ -9,9 +8,11 @@ from faststream.rabbit import (
 )
 from faststream.rabbit.schemas import Channel
 
-from src.application.dto.client_message import ClientMessageDTO
 from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.client_message import ClientMessageDTO
+from src.application.use_cases.admin_message_use_case import AdminMessageUseCase
 from src.application.use_cases.client_message_use_case import ClientMessageUseCase
+
 
 exchange = RabbitExchange("chat", durable=True, type=ExchangeType.DIRECT)
 
@@ -49,7 +50,6 @@ async def client_message_consumer(
 @inject
 async def admin_message_consumer(
         payload: AdminMessageDTO,
-        logger: FromDishka[structlog.BoundLogger],
+        use_case: FromDishka[AdminMessageUseCase]
 ):
-    logger.info(payload)
-    logger.info("я тут")
+    await use_case(payload)

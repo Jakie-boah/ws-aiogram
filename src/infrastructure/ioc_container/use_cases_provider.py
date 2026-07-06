@@ -1,9 +1,9 @@
 from dishka import Provider, Scope, provide
 
+from src.application.use_cases.admin_message_use_case import AdminMessageUseCase
 from src.application.use_cases.client_message_use_case import ClientMessageUseCase
 from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
 from src.application.use_cases.publish_client_message_use_case import PublishClientMessageUseCase
-from src.application.use_cases.admin_message_use_case import AdminMessageUseCase
 
 
 class UseCasesProvider(Provider):

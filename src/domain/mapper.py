@@ -1,8 +1,8 @@
-from src.application.dto.client_message import ClientMessageDTO
-from src.domain.entities.client_message import ClientMessage
-from src.domain.entities.admin_message import AdminMessage
 from src.application.dto.admin_message import AdminMessageDTO
-from src.domain.values import Text, UserId, MessageId
+from src.application.dto.client_message import ClientMessageDTO
+from src.domain.entities.admin_message import AdminMessage
+from src.domain.entities.client_message import ClientMessage
+from src.domain.values import MessageId, Text, UserId
 
 
 def map_client_message_from_dto(payload: ClientMessageDTO) -> ClientMessage:

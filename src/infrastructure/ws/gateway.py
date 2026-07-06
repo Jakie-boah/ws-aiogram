@@ -1,7 +1,8 @@
-from src.application.interfaces.ws.gateway import WSGatewayAPI
 import structlog
 from aiohttp import ClientSession
-from src.domain.values import UserId, Text
+
+from src.application.interfaces.ws.gateway import WSGatewayAPI
+from src.domain.values import Text, UserId
 
 
 class ImplWSGatewayAPI(WSGatewayAPI):

@@ -1,9 +1,9 @@
 import structlog
 
+from src.application.dto.admin_message import AdminMessageDTO
 from src.application.interfaces.broker.publisher import BrokerPublisher
 from src.domain.entities.admin_message import AdminMessage
 from src.domain.mapper import map_admin_message_from_dto
-from src.application.dto.admin_message import AdminMessageDTO
 
 
 class PublishAdminMessageUseCase:

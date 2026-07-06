@@ -1,21 +1,21 @@
 import asyncio
 
-import structlog
 from aiogram import Bot, Dispatcher, F, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-
 from dishka.integrations.aiogram import (
     FromDishka,
     inject,
     setup_dishka,
 )
-from src.presentation.dependency_container import create_container
-from src.infrastructure.config.config_loader import load_config_from_env
-from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
+
 from src.application.dto.admin_message import AdminMessageDTO
+from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
+from src.infrastructure.config.config_loader import load_config_from_env
+from src.presentation.dependency_container import create_container
+
 
 dp = Dispatcher()
 

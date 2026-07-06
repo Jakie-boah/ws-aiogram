@@ -1,13 +1,12 @@
 import structlog
+from aiohttp import ClientSession
 from dishka import Provider, Scope, provide
 
 from src.application.interfaces.ws.connection_manager import ConnectionManager
-from src.infrastructure.ws.connection import ImplConnectionManager
 from src.application.interfaces.ws.gateway import WSGatewayAPI
-from src.infrastructure.ws.gateway import ImplWSGatewayAPI
-
 from src.infrastructure.config.config_storage import Config
-from aiohttp import ClientSession
+from src.infrastructure.ws.connection import ImplConnectionManager
+from src.infrastructure.ws.gateway import ImplWSGatewayAPI
 
 
 class WSProvider(Provider):
