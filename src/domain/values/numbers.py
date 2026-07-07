@@ -24,3 +24,13 @@ class UserId(BaseValueObject):
             raise UserIdValidationError(field="user_id", message="Must be an integer")
         if self.value <= 0:
             raise UserIdValidationError(field="user_id", message="Must be positive")
+
+
+@dataclass(slots=True, frozen=True)
+class ClientId(UserId):
+    ...
+
+
+@dataclass(slots=True, frozen=True)
+class AdminId(UserId):
+    ...

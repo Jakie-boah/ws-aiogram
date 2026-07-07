@@ -1,6 +1,11 @@
 import pytest
 
-from src.domain.values.ticket_status import TicketStatus, TicketState
+from src.domain.values.ticket_status import (
+    TicketStatus,
+    TicketState,
+    CloseReason,
+    CloseReasons,
+)
 import src.domain.errors as errors
 
 
@@ -127,3 +132,27 @@ def test_on_close_returns_new_instance():
 
     assert new_ts is not ts
     assert ts.value == TicketState.WAITING_CLIENT
+
+
+# --- CloseReason: VO поверх enum причин закрытия ---
+
+
+def test_close_reason_resolved():
+    assert CloseReason(CloseReasons.RESOLVED).value is CloseReasons.RESOLVED
+
+
+def test_close_reason_expired():
+    assert CloseReason(CloseReasons.EXPIRED).value is CloseReasons.EXPIRED
+
+
+@pytest.mark.parametrize(
+    "bad_value",
+    (
+        "resolved",  # сырая строка, не член enum
+        None,
+        123,
+    ),
+)
+def test_close_reason_invalid_raises(bad_value):
+    with pytest.raises(errors.CloseReasonValidationError):
+        CloseReason(bad_value)

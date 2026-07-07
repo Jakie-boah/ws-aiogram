@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.domain.values.base import BaseValueObject
-from src.domain.errors.ticket_status import TicketStatusValidationError, IllegalTicketTransition
+from src.domain.errors.ticket_status import TicketStatusValidationError, IllegalTicketTransition, CloseReasonValidationError
 from enum import StrEnum, Enum, auto
 
 from typing import ClassVar
@@ -18,6 +18,11 @@ class TicketEvent(Enum):
     CLIENT_MESSAGE = auto()
     ADMIN_REPLY = auto()
     CLOSE = auto()
+
+
+class CloseReasons(StrEnum):
+    RESOLVED = "resolved"
+    EXPIRED = "expired"
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,3 +77,15 @@ class TicketStatus(BaseValueObject):
 
     def on_close(self) -> "TicketStatus":
         return self._apply(TicketEvent.CLOSE)
+
+
+@dataclass(frozen=True, slots=True)
+class CloseReason(BaseValueObject):
+    value: CloseReasons
+
+    def validate(self):
+        if not isinstance(self.value, CloseReasons):
+            raise CloseReasonValidationError(
+                field="close_reason",
+                message=f"Close reason must be instance of CloseReasons. Got: {self.value}",
+            )
