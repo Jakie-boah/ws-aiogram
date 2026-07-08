@@ -1,10 +1,13 @@
 from dataclasses import dataclass
-
-from src.domain.values.base import BaseValueObject
-from src.domain.errors.ticket_status import TicketStatusValidationError, IllegalTicketTransition, CloseReasonValidationError
-from enum import StrEnum, Enum, auto
-
+from enum import Enum, StrEnum, auto
 from typing import ClassVar
+
+from src.domain.errors.ticket_status import (
+    CloseReasonValidationError,
+    IllegalTicketTransition,
+    TicketStatusValidationError,
+)
+from src.domain.values.base import BaseValueObject
 
 
 class TicketState(StrEnum):
