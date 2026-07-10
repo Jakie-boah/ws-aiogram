@@ -4,7 +4,7 @@ from src.domain.values.ticket_status import (
     TicketStatus,
     TicketState,
     CloseReason,
-    CloseReasons,
+    CloseReasonType,
 )
 import src.domain.errors as errors
 
@@ -63,34 +63,34 @@ def test_admin_reply_from_open_waits_client():
     # реальный переход: админ впервые ответил на свежий тикет — мяч уходит к клиенту
     ts = TicketStatus(TicketState.OPEN)
 
-    assert ts.on_admin_reply().value == TicketState.WAITING_CLIENT
+    assert ts.on_admin_message().value == TicketState.WAITING_CLIENT
 
 
 def test_admin_reply_from_waiting_admin_moves_to_waiting_client():
     # реальный переход: ждали админа, он ответил — теперь ждём клиента
     ts = TicketStatus(TicketState.WAITING_ADMIN)
 
-    assert ts.on_admin_reply().value == TicketState.WAITING_CLIENT
+    assert ts.on_admin_message().value == TicketState.WAITING_CLIENT
 
 
 def test_admin_reply_from_waiting_client_stays_waiting_client():
     # self-loop: мяч уже у клиента, второй ответ админа ничего не меняет
     ts = TicketStatus(TicketState.WAITING_CLIENT)
 
-    assert ts.on_admin_reply().value == TicketState.WAITING_CLIENT
+    assert ts.on_admin_message().value == TicketState.WAITING_CLIENT
 
 
 def test_admin_reply_from_closed_raises():
     # closed терминальный — клетки нет, событие запрещено
     with pytest.raises(errors.IllegalTicketTransition):
-        TicketStatus(TicketState.CLOSED).on_admin_reply()
+        TicketStatus(TicketState.CLOSED).on_admin_message()
 
 
 def test_on_admin_reply_returns_new_instance():
     # иммутабельность: исходный статус не мутируется
     ts = TicketStatus(TicketState.WAITING_ADMIN)
 
-    new_ts = ts.on_admin_reply()
+    new_ts = ts.on_admin_message()
 
     assert new_ts is not ts
     assert ts.value == TicketState.WAITING_ADMIN
@@ -138,11 +138,11 @@ def test_on_close_returns_new_instance():
 
 
 def test_close_reason_resolved():
-    assert CloseReason(CloseReasons.RESOLVED).value is CloseReasons.RESOLVED
+    assert CloseReason(CloseReasonType.RESOLVED).value is CloseReasonType.RESOLVED
 
 
 def test_close_reason_expired():
-    assert CloseReason(CloseReasons.EXPIRED).value is CloseReasons.EXPIRED
+    assert CloseReason(CloseReasonType.EXPIRED).value is CloseReasonType.EXPIRED
 
 
 @pytest.mark.parametrize(

@@ -23,7 +23,7 @@ class TicketEvent(Enum):
     CLOSE = auto()
 
 
-class CloseReasons(StrEnum):
+class CloseReasonType(StrEnum):
     RESOLVED = "resolved"
     EXPIRED = "expired"
 
@@ -75,20 +75,31 @@ class TicketStatus(BaseValueObject):
     def on_client_message(self) -> "TicketStatus":
         return self._apply(TicketEvent.CLIENT_MESSAGE)
 
-    def on_admin_reply(self) -> "TicketStatus":
+    def on_admin_message(self) -> "TicketStatus":
         return self._apply(TicketEvent.ADMIN_REPLY)
 
     def on_close(self) -> "TicketStatus":
         return self._apply(TicketEvent.CLOSE)
 
+    def is_closed(self) -> bool:
+        return self.value == TicketState.CLOSED
+
 
 @dataclass(frozen=True, slots=True)
 class CloseReason(BaseValueObject):
-    value: CloseReasons
+    value: CloseReasonType
 
     def validate(self):
-        if not isinstance(self.value, CloseReasons):
+        if not isinstance(self.value, CloseReasonType):
             raise CloseReasonValidationError(
                 field="close_reason",
                 message=f"Close reason must be instance of CloseReasons. Got: {self.value}",
             )
+
+    @classmethod
+    def resolved(cls) -> "CloseReason":
+        return CloseReason(CloseReasonType.RESOLVED)
+
+    @classmethod
+    def expired(cls) -> "CloseReason":
+        return CloseReason(CloseReasonType.EXPIRED)
