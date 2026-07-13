@@ -1,8 +1,8 @@
-from src.domain.values import MessageId, Text
+from src.domain.values import MessageIdInt, Text
 
 
 class AdminMessage:
-    def __init__(self, *, message_id: MessageId, text: Text):
+    def __init__(self, *, message_id: MessageIdInt, text: Text):
         self.message_id = message_id
         self.text = text
 

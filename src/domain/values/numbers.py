@@ -5,7 +5,8 @@ from src.domain.values.base import BaseValueObject
 
 
 @dataclass(slots=True, frozen=True)
-class MessageId(BaseValueObject):
+class MessageIdInt(BaseValueObject):
+    """!!! deprecated !!!"""
     value: int
 
     def validate(self):

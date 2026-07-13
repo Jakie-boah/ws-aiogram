@@ -1,7 +1,7 @@
 from redis.asyncio.client import Redis
 
 from src.application.interfaces.redis.storage import RedisStorage
-from src.domain.values import MessageId, UserId
+from src.domain.values import MessageIdInt, UserId
 from src.infrastructure.redis.errors import RedisKeyNotFoundError
 
 
@@ -9,10 +9,10 @@ class ImplRedisStorage(RedisStorage):
     def __init__(self, redis: Redis):
         self.redis = redis
 
-    async def set(self, key: MessageId, value: UserId) -> None:
+    async def set(self, key: MessageIdInt, value: UserId) -> None:
         await self.redis.set(str(key.value), str(value.value))
 
-    async def get(self, key: MessageId) -> UserId:
+    async def get(self, key: MessageIdInt) -> UserId:
         result = await self.redis.get(str(key.value))
 
         if result:

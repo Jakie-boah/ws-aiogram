@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pytest
 
 from src.domain import errors
-from src.domain.values import MessageId, Text, UserId
+from src.domain.values import MessageIdInt, Text, UserId
 from src.domain.values.numbers import AdminId, ClientId
 
 
@@ -24,10 +24,10 @@ class Case:
 )
 def test_message_id(case):
     if case.will_pass:
-        assert MessageId(case.value)
+        assert MessageIdInt(case.value)
     else:
         with pytest.raises(errors.MessageIdValidationError):
-            MessageId(case.value)
+            MessageIdInt(case.value)
 
 
 @pytest.mark.parametrize(
