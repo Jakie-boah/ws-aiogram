@@ -146,7 +146,7 @@ class Message:
                         f"{self._sent_at} <= {self._delivered_at}",
             )
 
-        if self._sent_at <= self._delivered_at <= self._read_at:
+        if self._sent_at < self._delivered_at <= self._read_at:
             return
 
         raise MessageTimelineError(
