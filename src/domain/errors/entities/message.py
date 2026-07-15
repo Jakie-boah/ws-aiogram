@@ -10,3 +10,8 @@ class MessageAlreadyDeliveredError(AggregateError):
 @dataclass
 class MessageTimelineError(AggregateError):
     pass
+
+
+@dataclass
+class MessageValidationError(AggregateError):
+    pass

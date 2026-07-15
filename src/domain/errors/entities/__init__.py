@@ -1,5 +1,5 @@
 from .ticket import AdminAlreadyAssignedError, AdminIsNotAssignedError, TicketIsClosedError
-from .message import MessageAlreadyDeliveredError, MessageTimelineError
+from .message import MessageAlreadyDeliveredError, MessageTimelineError, MessageValidationError
 
 __all__ = [
     "AdminAlreadyAssignedError",
@@ -7,4 +7,5 @@ __all__ = [
     "MessageAlreadyDeliveredError",
     "TicketIsClosedError",
     "MessageTimelineError",
+    "MessageValidationError",
 ]

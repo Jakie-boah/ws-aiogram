@@ -5,8 +5,8 @@ from faker import Faker
 from zoneinfo import ZoneInfo
 
 from src.domain.entities.message import Message
-from src.domain.values import UserId, SenderType, Text, MessageType
-from src.domain.errors.entities import MessageAlreadyDeliveredError, MessageTimelineError
+from src.domain.values import UserId, SenderType, Text, MessageType, TicketId
+from src.domain.errors.entities import MessageAlreadyDeliveredError, MessageTimelineError, MessageValidationError
 
 fake = Faker()
 
@@ -22,6 +22,7 @@ def message() -> Message:
         sender_type=SenderType.CLIENT,
         text=Text(fake.text()),
         sent_at=fake.date_time(ZoneInfo("Europe/Moscow")),
+        ticket_id=TicketId.new(),
     )
 
 
@@ -29,15 +30,18 @@ def test_new_message_creates_pending_message():
     user_id = UserId(fake.pyint(min_value=1, max_value=1_000_000))
     text = Text(fake.text())
     now = fake.date_time(ZoneInfo("Europe/Moscow"))
+    ticket_id = TicketId.new()
 
     message = Message.new_message(
         sender_id=user_id,
         sender_type=SenderType.CLIENT,
         text=text,
         sent_at=now,
+        ticket_id=ticket_id,
     )
 
     assert message.id is not None
+    assert message.ticket_id == ticket_id
     assert message.sender_id == user_id
     assert message.sender_type == SenderType.CLIENT
     assert message.text == text
@@ -56,12 +60,10 @@ def test_mark_delivered_after_sent(message):
     assert message.delivered_at == delivered_at
 
 
-def test_mark_delivered_equal_to_sent_is_allowed(message):
+def test_mark_delivered_equal_to_sent_is_not_allowed(message):
     delivered_at = message.sent_at
-
-    message.mark_delivered_at(delivered_at)
-
-    assert message.delivered_at == delivered_at
+    with pytest.raises(MessageTimelineError):
+        message.mark_delivered_at(delivered_at)
 
 
 def test_mark_delivered_before_sent_raises(message):
@@ -140,3 +142,14 @@ def test_mark_read_is_idempotent(message):
 
     assert message.read_at == first_read
     assert message.delivered_at == first_read
+
+
+def test_message_validate_raise_error_no_text():
+    with pytest.raises(MessageValidationError):
+        Message.new_message(
+            sender_id=UserId(fake.pyint(min_value=1, max_value=1_000_000)),
+            sender_type=SenderType.CLIENT,
+            text=None,
+            sent_at=fake.date_time(ZoneInfo("Europe/Moscow")),
+            ticket_id=TicketId.new(),
+        )
