@@ -12,3 +12,8 @@ class MessageType(StrEnum):
     VIDEO = "video"
     AUDIO = "audio"
     FILE = "file"
+
+
+class TicketCloseReason(StrEnum):
+    RESOLVED = "resolved"
+    EXPIRED = "expired"

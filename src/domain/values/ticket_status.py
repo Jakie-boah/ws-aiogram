@@ -22,11 +22,6 @@ class TicketEvent(Enum):
     CLOSE = auto()
 
 
-class CloseReason(StrEnum):
-    RESOLVED = "resolved"
-    EXPIRED = "expired"
-
-
 @dataclass(frozen=True, slots=True)
 class TicketStatus(BaseValueObject):
     value: TicketState
@@ -83,22 +78,3 @@ class TicketStatus(BaseValueObject):
     def is_closed(self) -> bool:
         return self.value == TicketState.CLOSED
 
-
-# @dataclass(frozen=True, slots=True)
-# class CloseReason(BaseValueObject):
-#     value: CloseReasonType
-#
-#     def validate(self):
-#         if not isinstance(self.value, CloseReasonType):
-#             raise CloseReasonValidationError(
-#                 field="close_reason",
-#                 message=f"Close reason must be instance of CloseReasons. Got: {self.value}",
-#             )
-#
-#     @classmethod
-#     def resolved(cls) -> "CloseReason":
-#         return CloseReason(CloseReasonType.RESOLVED)
-#
-#     @classmethod
-#     def expired(cls) -> "CloseReason":
-#         return CloseReason(CloseReasonType.EXPIRED)

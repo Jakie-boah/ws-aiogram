@@ -1,9 +1,9 @@
 import datetime
 import pytest
 from src.domain.entities.ticket import Ticket
-from src.domain.values import ClientId, TicketId
+from src.domain.values import ClientId, TicketId, TicketCloseReason
 from faker import Faker
-from src.domain.values.ticket_status import TicketState, CloseReason
+from src.domain.values.ticket_status import TicketState
 from src.domain.values import AdminId, TicketStatus
 from src.domain.errors.entities.ticket import AdminAlreadyAssignedError, TicketIsClosedError, AdminIsNotAssignedError
 
@@ -96,12 +96,12 @@ def test_close(open_ticket):
     now = datetime.datetime.now(datetime.timezone.utc)
 
     open_ticket.close(
-        reason=CloseReason.RESOLVED, now=now
+        reason=TicketCloseReason.RESOLVED, now=now
     )
 
     assert open_ticket.status.value == TicketState.CLOSED
     assert open_ticket.closed_at == now
-    assert open_ticket.close_reason.value == CloseReason.RESOLVED.value
+    assert open_ticket.close_reason.value == TicketCloseReason.RESOLVED.value
     assert open_ticket.last_activity_at == now
 
 
@@ -109,4 +109,4 @@ def test_close_when_closed(open_ticket):
     open_ticket._status = TicketStatus(TicketState.CLOSED)
 
     with pytest.raises(TicketIsClosedError):
-        open_ticket.close(reason=CloseReason.RESOLVED, now=datetime.datetime.now(datetime.timezone.utc))
+        open_ticket.close(reason=TicketCloseReason.RESOLVED, now=datetime.datetime.now(datetime.timezone.utc))

@@ -1,7 +1,6 @@
-from src.domain.values import TicketId, ClientId, AdminId, TicketStatus
+from src.domain.values import TicketId, ClientId, AdminId, TicketStatus, TicketCloseReason
 from datetime import datetime
 from src.domain.errors.entities.ticket import AdminAlreadyAssignedError, AdminIsNotAssignedError, TicketIsClosedError
-from src.domain.values.ticket_status import CloseReason
 
 
 class Ticket:
@@ -15,7 +14,7 @@ class Ticket:
             created_at: datetime,
             last_activity_at: datetime,
             closed_at: datetime | None = None,
-            close_reason: CloseReason | None = None
+            close_reason: TicketCloseReason | None = None
     ):
         self._id = uid
         self._client_id = client_id
@@ -52,7 +51,7 @@ class Ticket:
         return self._closed_at
 
     @property
-    def close_reason(self) -> CloseReason | None:
+    def close_reason(self) -> TicketCloseReason | None:
         return self._close_reason
 
     @property
@@ -112,7 +111,7 @@ class Ticket:
 
         self._assigned_admin_id = admin_id
 
-    def close(self, *, reason: CloseReason, now: datetime):
+    def close(self, *, reason: TicketCloseReason, now: datetime):
         if self._status.is_closed():
             raise TicketIsClosedError(field="status", message="Ticket is already closed")
 
