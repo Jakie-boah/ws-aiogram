@@ -11,8 +11,3 @@ class TicketStatusValidationError(ValidationError):
 @dataclass
 class IllegalTicketTransition(ValidationError):
     pass
-
-
-@dataclass
-class CloseReasonValidationError(ValidationError):
-    pass

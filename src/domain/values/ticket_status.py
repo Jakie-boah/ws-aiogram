@@ -3,7 +3,6 @@ from enum import Enum, StrEnum, auto
 from typing import ClassVar
 
 from src.domain.errors.ticket_status import (
-    CloseReasonValidationError,
     IllegalTicketTransition,
     TicketStatusValidationError,
 )
@@ -23,7 +22,7 @@ class TicketEvent(Enum):
     CLOSE = auto()
 
 
-class CloseReasonType(StrEnum):
+class CloseReason(StrEnum):
     RESOLVED = "resolved"
     EXPIRED = "expired"
 
@@ -85,21 +84,21 @@ class TicketStatus(BaseValueObject):
         return self.value == TicketState.CLOSED
 
 
-@dataclass(frozen=True, slots=True)
-class CloseReason(BaseValueObject):
-    value: CloseReasonType
-
-    def validate(self):
-        if not isinstance(self.value, CloseReasonType):
-            raise CloseReasonValidationError(
-                field="close_reason",
-                message=f"Close reason must be instance of CloseReasons. Got: {self.value}",
-            )
-
-    @classmethod
-    def resolved(cls) -> "CloseReason":
-        return CloseReason(CloseReasonType.RESOLVED)
-
-    @classmethod
-    def expired(cls) -> "CloseReason":
-        return CloseReason(CloseReasonType.EXPIRED)
+# @dataclass(frozen=True, slots=True)
+# class CloseReason(BaseValueObject):
+#     value: CloseReasonType
+#
+#     def validate(self):
+#         if not isinstance(self.value, CloseReasonType):
+#             raise CloseReasonValidationError(
+#                 field="close_reason",
+#                 message=f"Close reason must be instance of CloseReasons. Got: {self.value}",
+#             )
+#
+#     @classmethod
+#     def resolved(cls) -> "CloseReason":
+#         return CloseReason(CloseReasonType.RESOLVED)
+#
+#     @classmethod
+#     def expired(cls) -> "CloseReason":
+#         return CloseReason(CloseReasonType.EXPIRED)

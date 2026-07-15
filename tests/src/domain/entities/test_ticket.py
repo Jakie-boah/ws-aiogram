@@ -96,12 +96,12 @@ def test_close(open_ticket):
     now = datetime.datetime.now(datetime.timezone.utc)
 
     open_ticket.close(
-        reason=CloseReason.resolved(), now=now
+        reason=CloseReason.RESOLVED, now=now
     )
 
     assert open_ticket.status.value == TicketState.CLOSED
     assert open_ticket.closed_at == now
-    assert open_ticket.close_reason.value == CloseReason.resolved().value
+    assert open_ticket.close_reason.value == CloseReason.RESOLVED.value
     assert open_ticket.last_activity_at == now
 
 
@@ -109,4 +109,4 @@ def test_close_when_closed(open_ticket):
     open_ticket._status = TicketStatus(TicketState.CLOSED)
 
     with pytest.raises(TicketIsClosedError):
-        open_ticket.close(reason=CloseReason.resolved(), now=datetime.datetime.now(datetime.timezone.utc))
+        open_ticket.close(reason=CloseReason.RESOLVED, now=datetime.datetime.now(datetime.timezone.utc))
