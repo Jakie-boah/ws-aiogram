@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from src.domain import errors
+from src.domain.errors import values as errors
 from src.domain.values import MessageIdInt, Text, UserId
 from src.domain.values.numbers import AdminId, ClientId
 

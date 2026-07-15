@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.domain.errors import TextValidationError
+from src.domain.errors.values.strings import TextValidationError
 from src.domain.values.base import BaseValueObject
 
 

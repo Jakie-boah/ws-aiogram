@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, StrEnum, auto
 from typing import ClassVar
 
-from src.domain.errors.ticket_status import (
+from src.domain.errors.values.ticket_status import (
     IllegalTicketTransition,
     TicketStatusValidationError,
 )

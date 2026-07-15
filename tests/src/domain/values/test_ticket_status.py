@@ -4,7 +4,7 @@ from src.domain.values.ticket_status import (
     TicketStatus,
     TicketState,
 )
-import src.domain.errors as errors
+from src.domain.errors import values as errors
 
 
 def test_initial():

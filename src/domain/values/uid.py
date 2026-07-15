@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 
-from src.domain.errors import TicketIdValidationError
+from src.domain.errors.values.uid import TicketIdValidationError
 from src.domain.values.base import BaseValueObject
 
 

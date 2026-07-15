@@ -3,7 +3,7 @@ from faker import Faker
 
 from src.application.dto.admin_message import AdminMessageDTO
 from src.application.dto.client_message import ClientMessageDTO
-from src.domain import errors
+from src.domain.errors import values as errors
 from src.domain.entities.admin_message import AdminMessage
 from src.domain.entities.client_message import ClientMessage
 from src.domain.mapper import map_admin_message_from_dto, map_client_message_from_dto

@@ -3,7 +3,7 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from src.domain import errors
+from src.domain.errors import values as errors
 from src.domain.values.uid import TicketId
 
 

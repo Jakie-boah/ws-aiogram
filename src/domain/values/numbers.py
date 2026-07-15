@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.domain.errors import MessageIdValidationError, UserIdValidationError
+from src.domain.errors.values.numbers import MessageIdValidationError, UserIdValidationError
 from src.domain.values.base import BaseValueObject
 
 
