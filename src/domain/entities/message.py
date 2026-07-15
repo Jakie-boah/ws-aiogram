@@ -1,6 +1,7 @@
 from src.domain.values import MessageId, Text, UserId, SenderType, MessageType
 
 from datetime import datetime
+from src.domain.errors.entities import MessageAlreadyDeliveredError, MessageTimelineError
 
 
 class Message:
@@ -56,6 +57,36 @@ class Message:
     @property
     def read_at(self) -> datetime | None:
         return self._read_at
+
+    def mark_delivered_at(self, now: datetime):
+        if self._delivered_at is not None:
+            raise MessageAlreadyDeliveredError(
+                field="delivered_at",
+                message="Message already delivered. Cannot set delivered_at again."
+            )
+
+        if now < self._sent_at:
+            raise MessageTimelineError(
+                field="delivered_at",
+                message=f"Cannot set delivered_at. delivered_at < sent_at - {now} < {self._sent_at}"
+            )
+
+        self._delivered_at = now
+
+    def mark_read_at(self, now: datetime):
+        if self._read_at is not None:
+            return
+
+        if self._delivered_at is None:
+            self.mark_delivered_at(now)
+
+        if now < self._delivered_at:
+            raise MessageTimelineError(
+                field="read_at",
+                message=f"Cannot set read_at. read_at < delivered_at - {now} < {self._delivered_at}"
+            )
+
+        self._read_at = now
 
     @classmethod
     def new_message(
