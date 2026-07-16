@@ -5,9 +5,35 @@ from src.domain.values import ClientId, TicketId, TicketCloseReason
 from faker import Faker
 from src.domain.values.ticket_status import TicketState
 from src.domain.values import AdminId, TicketStatus
-from src.domain.errors.entities.ticket import AdminAlreadyAssignedError, TicketIsClosedError, AdminIsNotAssignedError
+from src.domain.errors.entities.ticket import (
+    AdminAlreadyAssignedError,
+    AdminIsNotAssignedError,
+    TicketIsClosedError,
+    TicketTimelineError,
+    TicketValidationError,
+)
 
 fake = Faker()
+
+MINUTE = datetime.timedelta(minutes=1)
+DAY = datetime.timedelta(days=1)
+
+NOT_CLOSED_STATES = [TicketState.OPEN, TicketState.WAITING_ADMIN, TicketState.WAITING_CLIENT]
+
+
+def make_ticket(**overrides) -> Ticket:
+    """Регидрация через __init__. По умолчанию — валидный открытый тикет."""
+    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+    defaults = dict(
+        uid=TicketId.new(),
+        client_id=ClientId(fake.pyint(min_value=1, max_value=1000)),
+        status=TicketStatus(TicketState.OPEN),
+        created_at=created_at,
+        last_activity_at=created_at + MINUTE,
+        closed_at=None,
+        close_reason=None,
+    )
+    return Ticket(**{**defaults, **overrides})
 
 
 def test_ticket_open():
@@ -110,3 +136,158 @@ def test_close_when_closed(open_ticket):
 
     with pytest.raises(TicketIsClosedError):
         open_ticket.close(reason=TicketCloseReason.RESOLVED, now=datetime.datetime.now(datetime.timezone.utc))
+
+
+# --- регидрация: консистентность __init__ ---
+
+
+def test_rehydrate_open_ticket():
+    ticket = make_ticket()
+
+    assert ticket.status.value == TicketState.OPEN
+    assert ticket.closed_at is None
+    assert ticket.close_reason is None
+
+
+def test_rehydrate_created_equal_last_activity_is_allowed():
+    now = datetime.datetime.now(datetime.timezone.utc)
+
+    ticket = make_ticket(created_at=now, last_activity_at=now)
+
+    assert ticket.created_at == ticket.last_activity_at
+
+
+def test_rehydrate_closed_ticket_preserves_close_reason():
+    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+    closed_at = created_at + MINUTE
+
+    ticket = make_ticket(
+        status=TicketStatus(TicketState.CLOSED),
+        created_at=created_at,
+        last_activity_at=closed_at,
+        closed_at=closed_at,
+        close_reason=TicketCloseReason.EXPIRED,
+    )
+
+    assert ticket.status.value == TicketState.CLOSED
+    assert ticket.closed_at == closed_at
+    assert ticket.close_reason == TicketCloseReason.EXPIRED
+
+
+def test_rehydrate_closed_with_activity_before_closed_at_is_allowed():
+    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+    closed_at = created_at + DAY
+
+    ticket = make_ticket(
+        status=TicketStatus(TicketState.CLOSED),
+        created_at=created_at,
+        last_activity_at=created_at + MINUTE,
+        closed_at=closed_at,
+        close_reason=TicketCloseReason.RESOLVED,
+    )
+
+    assert ticket.last_activity_at < ticket.closed_at
+
+
+def test_rehydrate_last_activity_before_created_raises():
+    created_at = datetime.datetime.now(datetime.timezone.utc)
+
+    with pytest.raises(TicketTimelineError):
+        make_ticket(created_at=created_at, last_activity_at=created_at - MINUTE)
+
+
+def test_rehydrate_closed_with_last_activity_before_created_raises():
+    """Универсальная проверка created <= last_activity должна работать и в closed-ветке."""
+    created_at = datetime.datetime.now(datetime.timezone.utc)
+    closed_at = created_at + DAY
+
+    with pytest.raises(TicketTimelineError):
+        make_ticket(
+            status=TicketStatus(TicketState.CLOSED),
+            created_at=created_at,
+            last_activity_at=created_at - MINUTE,
+            closed_at=closed_at,
+            close_reason=TicketCloseReason.RESOLVED,
+        )
+
+
+def test_rehydrate_closed_without_closed_at_raises():
+    with pytest.raises(TicketValidationError):
+        make_ticket(
+            status=TicketStatus(TicketState.CLOSED),
+            closed_at=None,
+            close_reason=TicketCloseReason.RESOLVED,
+        )
+
+
+def test_rehydrate_closed_without_close_reason_raises():
+    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+
+    with pytest.raises(TicketValidationError):
+        make_ticket(
+            status=TicketStatus(TicketState.CLOSED),
+            created_at=created_at,
+            last_activity_at=created_at + MINUTE,
+            closed_at=created_at + DAY,
+            close_reason=None,
+        )
+
+
+def test_rehydrate_closed_with_activity_after_closed_at_raises():
+    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+    closed_at = created_at + MINUTE
+
+    with pytest.raises(TicketTimelineError):
+        make_ticket(
+            status=TicketStatus(TicketState.CLOSED),
+            created_at=created_at,
+            last_activity_at=closed_at + MINUTE,
+            closed_at=closed_at,
+            close_reason=TicketCloseReason.RESOLVED,
+        )
+
+
+@pytest.mark.parametrize("state", NOT_CLOSED_STATES)
+def test_rehydrate_not_closed_with_closed_at_raises(state):
+    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+
+    with pytest.raises(TicketValidationError):
+        make_ticket(
+            status=TicketStatus(state),
+            created_at=created_at,
+            last_activity_at=created_at + MINUTE,
+            closed_at=created_at + DAY,
+            close_reason=None,
+        )
+
+
+@pytest.mark.parametrize("state", NOT_CLOSED_STATES)
+def test_rehydrate_not_closed_with_close_reason_raises(state):
+    with pytest.raises(TicketValidationError):
+        make_ticket(
+            status=TicketStatus(state),
+            closed_at=None,
+            close_reason=TicketCloseReason.RESOLVED,
+        )
+
+
+def test_closed_ticket_round_trips_through_rehydration(open_ticket):
+    """Что произвёл close(), то __init__ обязан принять — фабрика и валидатор не должны расходиться."""
+    now = datetime.datetime.now(datetime.timezone.utc)
+    open_ticket.close(reason=TicketCloseReason.RESOLVED, now=now)
+
+    rehydrated = Ticket(
+        uid=open_ticket.id,
+        client_id=open_ticket.client_id,
+        status=open_ticket.status,
+        assigned_admin_id=open_ticket.admin_id,
+        created_at=open_ticket.created_at,
+        last_activity_at=open_ticket.last_activity_at,
+        closed_at=open_ticket.closed_at,
+        close_reason=open_ticket.close_reason,
+    )
+
+    assert rehydrated.status.value == TicketState.CLOSED
+    assert rehydrated.closed_at == now
+    assert rehydrated.close_reason == TicketCloseReason.RESOLVED
+    assert rehydrated.last_activity_at == now

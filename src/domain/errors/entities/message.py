@@ -1,5 +1,6 @@
-from src.domain.errors.base import AggregateError
 from dataclasses import dataclass
+
+from src.domain.errors.base import AggregateError
 
 
 @dataclass

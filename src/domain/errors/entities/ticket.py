@@ -1,5 +1,6 @@
-from src.domain.errors.base import AggregateError
 from dataclasses import dataclass
+
+from src.domain.errors.base import AggregateError
 
 
 @dataclass
@@ -14,4 +15,14 @@ class AdminIsNotAssignedError(AggregateError):
 
 @dataclass
 class TicketIsClosedError(AggregateError):
+    pass
+
+
+@dataclass
+class TicketTimelineError(AggregateError):
+    pass
+
+
+@dataclass
+class TicketValidationError(AggregateError):
     pass

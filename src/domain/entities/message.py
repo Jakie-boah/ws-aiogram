@@ -1,7 +1,7 @@
-from src.domain.values import MessageId, Text, UserId, SenderType, MessageType, TicketId
-
 from datetime import datetime
+
 from src.domain.errors.entities import MessageAlreadyDeliveredError, MessageTimelineError, MessageValidationError
+from src.domain.values import MessageId, MessageType, SenderType, Text, TicketId, UserId
 
 
 class Message:
