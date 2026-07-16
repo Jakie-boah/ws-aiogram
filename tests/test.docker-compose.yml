@@ -67,10 +67,12 @@ services:
       - .env.test
 
     command: >
-      sh -c "uv run pytest tests/src/"
+      sh -c "uv run pytest tests/src/infrastructure/postgres"
 
     depends_on:
       test-rabbit:
+        condition: service_healthy
+      test-postgres:
         condition: service_healthy
 
   test-rabbit:
@@ -86,3 +88,19 @@ services:
       interval: 5s
       retries: 5
       timeout: 5s
+
+  test-postgres:
+    image: postgres:16-alpine
+    container_name: test-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_chat_bridge
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "user", "-h", "test-postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3

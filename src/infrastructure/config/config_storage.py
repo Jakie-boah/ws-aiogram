@@ -10,3 +10,4 @@ class Config:
     internal_token: str
     ws_host: str
     ws_port: int
+    postgres: str

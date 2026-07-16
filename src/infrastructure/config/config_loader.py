@@ -19,4 +19,5 @@ def _create_config() -> Config:
         internal_token=os.environ["INTERNAL_TOKEN"],
         ws_host=os.environ["WS_HOST"],
         ws_port=int(os.environ["WS_PORT"]),
+        postgres=os.environ["POSTGRES"],
     )

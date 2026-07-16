@@ -35,4 +35,5 @@ def logger_setup():
 pytest_plugins = [
     "tests.fixtures.config",
     "tests.fixtures.ioc_container",
+    "tests.fixtures.postgres",
 ]

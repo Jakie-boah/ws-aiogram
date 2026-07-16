@@ -9,12 +9,14 @@ from src.infrastructure.ioc_container import (
     TgProvider,
     UseCasesProvider,
     WSProvider,
+    PostgresProvider,
 )
 
 
 def create_container(config: Config):
     return make_async_container(
         LoggerProvider(),
+        PostgresProvider(),
         WSProvider(),
         RabbitProvider(),
         TgProvider(),
