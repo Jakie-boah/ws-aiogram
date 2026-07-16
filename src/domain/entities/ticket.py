@@ -4,6 +4,9 @@ from src.domain.errors.entities import ticket as ticket_errors
 from src.domain.values import AdminId, ClientId, TicketCloseReason, TicketId, TicketStatus
 
 
+_DT_FMT = "%Y-%m-%d %H:%M:%S.%f%z"
+
+
 class Ticket:
     def __init__(
             self,
@@ -26,7 +29,7 @@ class Ticket:
         self._last_activity_at = last_activity_at
         self._closed_at = closed_at
         self._close_reason = close_reason
-        self._validate_dates()
+        self._validate()
 
     @property
     def id(self) -> TicketId:
@@ -68,7 +71,7 @@ class Ticket:
             now: datetime
     ) -> "Ticket":
         return cls(
-            uid=TicketId.new(),
+            uid=TicketId.generate(),
             client_id=client_id,
             status=TicketStatus.initial(),
             created_at=now,
@@ -79,7 +82,7 @@ class Ticket:
         if self._status.is_closed():
             raise ticket_errors.TicketIsClosedError(
                 field="status",
-                message="Ticket is closed. Cannot register client message"
+                message="Ticket is closed. Cannot register client message."
             )
 
         self._status = self._status.on_client_message()
@@ -89,13 +92,13 @@ class Ticket:
         if self._status.is_closed():
             raise ticket_errors.TicketIsClosedError(
                 field="status",
-                message="Ticket was closed."
+                message="Ticket is closed. Cannot register admin message."
             )
 
         if self._assigned_admin_id is None:
             raise ticket_errors.AdminIsNotAssignedError(
                 field="assigned_admin_id",
-                message="Admin is not assigned. Cannot register message"
+                message="Admin is not assigned. Cannot register admin message."
             )
 
         self._status = self._status.on_admin_message()
@@ -108,17 +111,20 @@ class Ticket:
         if self._status.is_closed():
             raise ticket_errors.TicketIsClosedError(
                 field="status",
-                message="Ticket is closed. Cannot assign admin"
+                message="Ticket is closed. Cannot assign admin."
             )
 
         if self._assigned_admin_id is not None:
-            raise ticket_errors.AdminAlreadyAssignedError(field="assigned_admin_id", message="Admin already assigned")
+            raise ticket_errors.AdminAlreadyAssignedError(
+                field="assigned_admin_id",
+                message=f"Admin {self._assigned_admin_id.value} is already assigned to this ticket."
+            )
 
         self._assigned_admin_id = admin_id
 
     def close(self, *, reason: TicketCloseReason, now: datetime):
         if self._status.is_closed():
-            raise ticket_errors.TicketIsClosedError(field="status", message="Ticket is already closed")
+            raise ticket_errors.TicketIsClosedError(field="status", message="Ticket is already closed.")
 
         self._status = self._status.on_close()
         self._close_reason = reason
@@ -126,39 +132,45 @@ class Ticket:
         self._closed_at = now
         self._set_last_activity(now)
 
-    def _validate_dates(self):
+    def _validate(self):
         if self._created_at > self._last_activity_at:
             raise ticket_errors.TicketTimelineError(
                 field="last_activity_at",
-                message="Last activity at cannot be before created at"
+                message=f"Wrong timeline: created_at <= last_activity_at. "
+                        f"Got created_at={self._created_at:{_DT_FMT}}, "
+                        f"last_activity_at={self._last_activity_at:{_DT_FMT}}."
             )
 
         if self._status.is_closed():
             if self._closed_at is None:
                 raise ticket_errors.TicketValidationError(
                     field="closed_at",
-                    message="closed_at cannot be None"
+                    message=f"closed_at is required when status is '{self._status.value}'."
                 )
             if self._close_reason is None:
                 raise ticket_errors.TicketValidationError(
                     field="close_reason",
-                    message="close_reason cannot be None"
+                    message=f"close_reason is required when status is '{self._status.value}'."
                 )
             if self._last_activity_at > self._closed_at:
                 raise ticket_errors.TicketTimelineError(
                     field="closed_at",
-                    message="Closed at cannot be before last activity at"
+                    message=f"Wrong timeline: last_activity_at <= closed_at. "
+                            f"Got last_activity_at={self._last_activity_at:{_DT_FMT}}, "
+                            f"closed_at={self._closed_at:{_DT_FMT}}."
                 )
 
         else:
             if self._closed_at is not None:
                 raise ticket_errors.TicketValidationError(
                     field="closed_at",
-                    message="closed_at cannot be set if ticket's status is not closed"
+                    message=f"closed_at must be None when status is '{self._status.value}'. "
+                            f"Got {self._closed_at:{_DT_FMT}}."
                 )
 
             if self._close_reason is not None:
                 raise ticket_errors.TicketValidationError(
                     field="close_reason",
-                    message="close_reason cannot be set if ticket's status is not closed"
+                    message=f"close_reason must be None when status is '{self._status.value}'. "
+                            f"Got '{self._close_reason}'."
                 )

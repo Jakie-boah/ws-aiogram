@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 
-from src.domain.errors.values.uid import TicketIdValidationError
+from src.domain.errors.values.uid import MessageIdValidationError, TicketIdValidationError
 from src.domain.values.base import BaseValueObject
 
 
@@ -20,7 +20,7 @@ class TicketId(BaseValueObject):
             )
 
     @classmethod
-    def new(cls):
+    def generate(cls):
         return cls(value=uuid4())
 
 
@@ -30,11 +30,11 @@ class MessageId(BaseValueObject):
 
     def validate(self):
         if not self.value:
-            raise TicketIdValidationError(
+            raise MessageIdValidationError(
                 field="message_id", message="MessageId is required"
             )
         if not isinstance(self.value, UUID):
-            raise TicketIdValidationError(
+            raise MessageIdValidationError(
                 field="message_id", message="MessageId must be a UUID"
             )
 

@@ -4,6 +4,9 @@ from src.domain.errors.entities import MessageAlreadyDeliveredError, MessageTime
 from src.domain.values import MessageId, MessageType, SenderType, Text, TicketId, UserId
 
 
+_DT_FMT = "%Y-%m-%d %H:%M:%S.%f%z"
+
+
 class Message:
     def __init__(
             self,
@@ -57,7 +60,7 @@ class Message:
         return self._sent_at
 
     @property
-    def msg_type(self) -> MessageType:
+    def message_type(self) -> MessageType:
         return self._message_type
 
     @property
@@ -72,13 +75,15 @@ class Message:
         if self._delivered_at is not None:
             raise MessageAlreadyDeliveredError(
                 field="delivered_at",
-                message="Message already delivered. Cannot set delivered_at again."
+                message=f"Message already delivered at {self._delivered_at:{_DT_FMT}}. "
+                        f"delivered_at cannot be set twice."
             )
 
         if now <= self._sent_at:
             raise MessageTimelineError(
                 field="delivered_at",
-                message=f"Cannot set delivered_at. delivered_at < sent_at - {now} < {self._sent_at}"
+                message=f"Wrong timeline: sent_at < delivered_at. "
+                        f"Got sent_at={self._sent_at:{_DT_FMT}}, delivered_at={now:{_DT_FMT}}."
             )
 
         self._delivered_at = now
@@ -93,7 +98,8 @@ class Message:
         if now < self._delivered_at:
             raise MessageTimelineError(
                 field="read_at",
-                message=f"Cannot set read_at. read_at < delivered_at - {now} < {self._delivered_at}"
+                message=f"Wrong timeline: delivered_at <= read_at. "
+                        f"Got delivered_at={self._delivered_at:{_DT_FMT}}, read_at={now:{_DT_FMT}}."
             )
 
         self._read_at = now
@@ -122,35 +128,41 @@ class Message:
 
     def _validate_msg(self):
         if self._message_type == MessageType.TEXT and self._text is None:
-            raise MessageValidationError(field="text", message="Text cannot be empty, when message type is TEXT.")
+            raise MessageValidationError(
+                field="text",
+                message=f"text is required when message_type is '{MessageType.TEXT}'."
+            )
 
     def _validate_dates(self):
         if self._sent_at is None:
-            raise MessageValidationError(field="sent_at", message="sent_at cannot be None.")
+            raise MessageValidationError(field="sent_at", message="sent_at is required.")
 
         if self._delivered_at is None:
             if self._read_at is not None:
                 raise MessageValidationError(
                     field="delivered_at",
-                    message="delivered_at cannot be None when read_at is set.",
+                    message=f"delivered_at is required when read_at is set. "
+                            f"Got read_at={self._read_at:{_DT_FMT}}, delivered_at=None.",
                 )
             return
 
         if self._read_at is None:
-            if self._sent_at <= self._delivered_at:
+            if self._sent_at < self._delivered_at:
                 return
 
             raise MessageTimelineError(
                 field="msg_timeline",
-                message=f"Wrong timeline: sent_at <= delivered_at. "
-                        f"{self._sent_at} <= {self._delivered_at}",
+                message=f"Wrong timeline: sent_at < delivered_at. "
+                        f"Got sent_at={self._sent_at:{_DT_FMT}}, delivered_at={self._delivered_at:{_DT_FMT}}.",
             )
 
         if self._sent_at < self._delivered_at <= self._read_at:
             return
 
         raise MessageTimelineError(
-                field="msg_timeline",
-                message=f"Wrong timeline. sent_at <= delivered_at <= read_at. "
-                        f"{self._sent_at} < {self._delivered_at} <= {self._read_at}"
-            )
+            field="msg_timeline",
+            message=f"Wrong timeline: sent_at < delivered_at <= read_at. "
+                    f"Got sent_at={self._sent_at:{_DT_FMT}}, "
+                    f"delivered_at={self._delivered_at:{_DT_FMT}}, "
+                    f"read_at={self._read_at:{_DT_FMT}}."
+        )

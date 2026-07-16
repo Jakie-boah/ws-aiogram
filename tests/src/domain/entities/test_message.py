@@ -22,7 +22,7 @@ def message() -> Message:
         sender_type=SenderType.CLIENT,
         text=Text(fake.text()),
         sent_at=fake.date_time(ZoneInfo("Europe/Moscow")),
-        ticket_id=TicketId.new(),
+        ticket_id=TicketId.generate(),
     )
 
 
@@ -30,7 +30,7 @@ def test_new_message_creates_pending_message():
     user_id = UserId(fake.pyint(min_value=1, max_value=1_000_000))
     text = Text(fake.text())
     now = fake.date_time(ZoneInfo("Europe/Moscow"))
-    ticket_id = TicketId.new()
+    ticket_id = TicketId.generate()
 
     message = Message.new_message(
         sender_id=user_id,
@@ -46,7 +46,7 @@ def test_new_message_creates_pending_message():
     assert message.sender_type == SenderType.CLIENT
     assert message.text == text
     assert message.sent_at == now
-    assert message.msg_type == MessageType.TEXT
+    assert message.message_type == MessageType.TEXT
 
     assert message.delivered_at is None
     assert message.read_at is None
@@ -151,5 +151,5 @@ def test_message_validate_raise_error_no_text():
             sender_type=SenderType.CLIENT,
             text=None,
             sent_at=fake.date_time(ZoneInfo("Europe/Moscow")),
-            ticket_id=TicketId.new(),
+            ticket_id=TicketId.generate(),
         )

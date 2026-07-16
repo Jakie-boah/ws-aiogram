@@ -25,7 +25,7 @@ def make_ticket(**overrides) -> Ticket:
     """Регидрация через __init__. По умолчанию — валидный открытый тикет."""
     created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
     defaults = dict(
-        uid=TicketId.new(),
+        uid=TicketId.generate(),
         client_id=ClientId(fake.pyint(min_value=1, max_value=1000)),
         status=TicketStatus(TicketState.OPEN),
         created_at=created_at,
