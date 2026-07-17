@@ -1,10 +1,14 @@
-from src.application.interfaces.postgres.repository.ticket_repository import PostgresTicketRepository
+from src.application.interfaces.postgres.repositories.ticket_repository import PostgresTicketRepository
 from src.domain.entities.ticket import Ticket
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.values import TicketId, ClientId
+from src.domain.values import TicketId, ClientId, TicketState
 
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from src.infrastructure.postgres.tables import tickets_table
+from sqlalchemy import select
+from src.infrastructure.postgres.repositories.mapper import map_ticket_entity_from_db
+
+from src.application.interfaces.postgres.repositories.errors import EntityNotFoundError
 
 
 class ImplPostgresTicketRepository(PostgresTicketRepository):
@@ -35,8 +39,25 @@ class ImplPostgresTicketRepository(PostgresTicketRepository):
         )
         await self._session.execute(stmt)
 
-    async def get(self, uid: TicketId):
-        raise NotImplementedError
+    async def get(self, uid: TicketId) -> Ticket:
+        rows = await self._session.execute(
+            select(tickets_table).where(tickets_table.c.id == uid.value)
+        )
+        result = rows.mappings().first()
+
+        if result is None:
+            raise EntityNotFoundError(
+                field="id", message=f"Ticket with id {uid.value} not found"
+            )
+
+        return map_ticket_entity_from_db(result)
 
     async def find_active_by_client(self, client_id: ClientId) -> Ticket | None:
-        raise NotImplementedError
+        rows = await self._session.execute(
+            select(tickets_table).where(
+                (tickets_table.c.client_id == client_id.value) &
+                (tickets_table.c.status != TicketState.CLOSED)
+            )
+        )
+        result = rows.mappings().one_or_none()
+        return map_ticket_entity_from_db(result) if result else None

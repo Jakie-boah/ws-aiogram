@@ -1,4 +1,4 @@
-from src.application.interfaces.postgres.repository.base import Repository
+from src.application.interfaces.postgres.repositories.base import Repository
 
 from typing import Protocol
 from src.domain.values import TicketId, ClientId
