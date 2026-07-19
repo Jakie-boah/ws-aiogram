@@ -141,27 +141,27 @@ def test_close_when_closed(open_ticket):
 # --- регидрация: консистентность __init__ ---
 
 
-def test_rehydrate_open_ticket():
-    ticket = make_ticket()
+def test_rehydrate_open_ticket(ticket):
+    ticket = ticket()
 
     assert ticket.status.value == TicketState.OPEN
     assert ticket.closed_at is None
     assert ticket.close_reason is None
 
 
-def test_rehydrate_created_equal_last_activity_is_allowed():
+def test_rehydrate_created_equal_last_activity_is_allowed(ticket):
     now = datetime.datetime.now(datetime.timezone.utc)
 
-    ticket = make_ticket(created_at=now, last_activity_at=now)
+    ticket = ticket(created_at=now, last_activity_at=now)
 
     assert ticket.created_at == ticket.last_activity_at
 
 
-def test_rehydrate_closed_ticket_preserves_close_reason():
+def test_rehydrate_closed_ticket_preserves_close_reason(ticket):
     created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
     closed_at = created_at + MINUTE
 
-    ticket = make_ticket(
+    ticket = ticket(
         status=TicketStatus(TicketState.CLOSED),
         created_at=created_at,
         last_activity_at=closed_at,
@@ -174,11 +174,11 @@ def test_rehydrate_closed_ticket_preserves_close_reason():
     assert ticket.close_reason == TicketCloseReason.EXPIRED
 
 
-def test_rehydrate_closed_with_activity_before_closed_at_is_allowed():
+def test_rehydrate_closed_with_activity_before_closed_at_is_allowed(ticket):
     created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
     closed_at = created_at + DAY
 
-    ticket = make_ticket(
+    ticket = ticket(
         status=TicketStatus(TicketState.CLOSED),
         created_at=created_at,
         last_activity_at=created_at + MINUTE,
@@ -189,20 +189,20 @@ def test_rehydrate_closed_with_activity_before_closed_at_is_allowed():
     assert ticket.last_activity_at < ticket.closed_at
 
 
-def test_rehydrate_last_activity_before_created_raises():
+def test_rehydrate_last_activity_before_created_raises(ticket):
     created_at = datetime.datetime.now(datetime.timezone.utc)
 
     with pytest.raises(TicketTimelineError):
-        make_ticket(created_at=created_at, last_activity_at=created_at - MINUTE)
+        ticket(created_at=created_at, last_activity_at=created_at - MINUTE)
 
 
-def test_rehydrate_closed_with_last_activity_before_created_raises():
+def test_rehydrate_closed_with_last_activity_before_created_raises(ticket):
     """Универсальная проверка created <= last_activity должна работать и в closed-ветке."""
     created_at = datetime.datetime.now(datetime.timezone.utc)
     closed_at = created_at + DAY
 
     with pytest.raises(TicketTimelineError):
-        make_ticket(
+        ticket(
             status=TicketStatus(TicketState.CLOSED),
             created_at=created_at,
             last_activity_at=created_at - MINUTE,
@@ -211,20 +211,20 @@ def test_rehydrate_closed_with_last_activity_before_created_raises():
         )
 
 
-def test_rehydrate_closed_without_closed_at_raises():
+def test_rehydrate_closed_without_closed_at_raises(ticket):
     with pytest.raises(TicketValidationError):
-        make_ticket(
+        ticket(
             status=TicketStatus(TicketState.CLOSED),
             closed_at=None,
             close_reason=TicketCloseReason.RESOLVED,
         )
 
 
-def test_rehydrate_closed_without_close_reason_raises():
+def test_rehydrate_closed_without_close_reason_raises(ticket):
     created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
 
     with pytest.raises(TicketValidationError):
-        make_ticket(
+        ticket(
             status=TicketStatus(TicketState.CLOSED),
             created_at=created_at,
             last_activity_at=created_at + MINUTE,
@@ -233,12 +233,12 @@ def test_rehydrate_closed_without_close_reason_raises():
         )
 
 
-def test_rehydrate_closed_with_activity_after_closed_at_raises():
+def test_rehydrate_closed_with_activity_after_closed_at_raises(ticket):
     created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
     closed_at = created_at + MINUTE
 
     with pytest.raises(TicketTimelineError):
-        make_ticket(
+        ticket(
             status=TicketStatus(TicketState.CLOSED),
             created_at=created_at,
             last_activity_at=closed_at + MINUTE,
@@ -248,11 +248,11 @@ def test_rehydrate_closed_with_activity_after_closed_at_raises():
 
 
 @pytest.mark.parametrize("state", NOT_CLOSED_STATES)
-def test_rehydrate_not_closed_with_closed_at_raises(state):
+def test_rehydrate_not_closed_with_closed_at_raises(state, ticket):
     created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
 
     with pytest.raises(TicketValidationError):
-        make_ticket(
+        ticket(
             status=TicketStatus(state),
             created_at=created_at,
             last_activity_at=created_at + MINUTE,
@@ -262,9 +262,9 @@ def test_rehydrate_not_closed_with_closed_at_raises(state):
 
 
 @pytest.mark.parametrize("state", NOT_CLOSED_STATES)
-def test_rehydrate_not_closed_with_close_reason_raises(state):
+def test_rehydrate_not_closed_with_close_reason_raises(state, ticket):
     with pytest.raises(TicketValidationError):
-        make_ticket(
+        ticket(
             status=TicketStatus(state),
             closed_at=None,
             close_reason=TicketCloseReason.RESOLVED,
