@@ -21,21 +21,6 @@ DAY = datetime.timedelta(days=1)
 NOT_CLOSED_STATES = [TicketState.OPEN, TicketState.WAITING_ADMIN, TicketState.WAITING_CLIENT]
 
 
-def make_ticket(**overrides) -> Ticket:
-    """Регидрация через __init__. По умолчанию — валидный открытый тикет."""
-    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
-    defaults = dict(
-        uid=TicketId.generate(),
-        client_id=ClientId(fake.pyint(min_value=1, max_value=1000)),
-        status=TicketStatus(TicketState.OPEN),
-        created_at=created_at,
-        last_activity_at=created_at + MINUTE,
-        closed_at=None,
-        close_reason=None,
-    )
-    return Ticket(**{**defaults, **overrides})
-
-
 def test_ticket_open():
     client_id = ClientId(fake.pyint(min_value=1, max_value=1000))
     now = datetime.datetime.now(datetime.timezone.utc)
