@@ -1,10 +1,12 @@
 from src.domain.entities.ticket import Ticket
+from src.domain.entities.message import Message
 
 import pytest
 
 from faker import Faker
 import datetime
-from src.domain.values import ClientId, TicketStatus, TicketState, TicketId
+from src.domain.values import ClientId, TicketStatus, TicketState, TicketId, UserId, SenderType, Text
+from zoneinfo import ZoneInfo
 
 fake = Faker()
 
@@ -29,3 +31,24 @@ def ticket():
         return Ticket(**{**defaults, **overrides})
 
     return __get_ticket
+
+
+@pytest.fixture
+def message(ticket):
+    def __get_message(**overrides):
+        nonlocal ticket
+        ticket = ticket()
+
+        defaults = dict(
+            sender_id=UserId(fake.pyint(min_value=1, max_value=1_000_000)),
+            sender_type=SenderType.CLIENT,
+            text=Text(fake.text()),
+            sent_at=fake.date_time(ZoneInfo("Europe/Moscow")),
+        )
+
+        return Message.new_message(
+            **{**defaults, **overrides},
+            ticket_id=ticket.id,
+        )
+
+    return __get_message

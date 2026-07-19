@@ -1,4 +1,5 @@
-from sqlalchemy import MetaData, Table, Column, UUID, String, BigInteger, TIMESTAMP, CheckConstraint, Index, text
+from sqlalchemy import MetaData, Table, Column, UUID, String, BigInteger, TIMESTAMP, CheckConstraint, Index, text, \
+    ForeignKey
 from src.domain.values import TicketState, TicketCloseReason
 
 metadata = MetaData()
@@ -49,5 +50,14 @@ tickets_table = Table(
 messages_table = Table(
     "messages", metadata,
     Column("id", UUID(as_uuid=True), primary_key=True),
+    Column("ticket_id", ForeignKey("tickets.id"), nullable=False),
+    Column("sender_id", BigInteger, nullable=False),
+    Column("sender_type", String(20), nullable=False),
+    Column("message_type", String(20), nullable=False),
+    Column("text", String, nullable=True),
+
+    Column("sent_at", TIMESTAMP(timezone=True), nullable=False),
+    Column("delivered_at", TIMESTAMP(timezone=True), nullable=True),
+    Column("read_at", TIMESTAMP(timezone=True), nullable=True),
 
 )
