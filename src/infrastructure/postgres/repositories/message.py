@@ -7,6 +7,8 @@ from src.infrastructure.postgres.tables import messages_table
 from src.infrastructure.postgres.repositories.mapper import map_message_entity_from_db
 from sqlalchemy import select
 
+from src.application.interfaces.postgres.repositories.errors import EntityNotFoundError
+
 
 class ImplPostgresMessageRepository(PostgresMessageRepository):
     def __init__(self, session: AsyncSession):
@@ -41,6 +43,9 @@ class ImplPostgresMessageRepository(PostgresMessageRepository):
         result = rows.mappings().one_or_none()
 
         if result is None:
-            raise
+            raise EntityNotFoundError(
+                field="message_id",
+                message=f"Message with id {uid.value} not found"
+            )
 
         return map_message_entity_from_db(result)
