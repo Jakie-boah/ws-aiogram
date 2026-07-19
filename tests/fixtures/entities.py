@@ -16,29 +16,27 @@ DAY = datetime.timedelta(days=1)
 
 @pytest.fixture
 def ticket():
-    created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
-    defaults = dict(
-        uid=TicketId.generate(),
-        client_id=ClientId(fake.pyint(min_value=1, max_value=1000)),
-        status=TicketStatus(TicketState.OPEN),
-        created_at=created_at,
-        last_activity_at=created_at + MINUTE,
-        closed_at=None,
-        close_reason=None,
-    )
-
     def __get_ticket(**overrides):
+        created_at = datetime.datetime.now(datetime.timezone.utc) - DAY
+
+        defaults = dict(
+            uid=TicketId.generate(),
+            client_id=ClientId(fake.pyint(min_value=1, max_value=1000)),
+            status=TicketStatus(TicketState.OPEN),
+            created_at=created_at,
+            last_activity_at=created_at + MINUTE,
+            closed_at=None,
+            close_reason=None,
+        )
+
         return Ticket(**{**defaults, **overrides})
 
     return __get_ticket
 
 
 @pytest.fixture
-def message(ticket):
-    def __get_message(**overrides):
-        nonlocal ticket
-        ticket = ticket()
-
+def message():
+    def __get_message(*, ticket, **overrides):
         defaults = dict(
             sender_id=UserId(fake.pyint(min_value=1, max_value=1_000_000)),
             sender_type=SenderType.CLIENT,

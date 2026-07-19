@@ -18,7 +18,7 @@ def message_repository(session):
 
 
 @pytest_asyncio.fixture()
-async def insert_ticket(ticket, session):
+async def inserted_ticket(ticket, session):
     ticket = ticket()
     await ImplPostgresTicketRepository(session).save(ticket)
     await session.commit()
@@ -26,9 +26,9 @@ async def insert_ticket(ticket, session):
 
 
 @pytest.mark.asyncio
-async def test_save(insert_ticket, message, session, repository):
-    ticket = insert_ticket
-    message = message()
+async def test_save(inserted_ticket, message, session, repository):
+    ticket = inserted_ticket
+    message = message(ticket=ticket)
     await repository.save(message)
     await session.commit()
     rows = await session.execute(select(messages_table).where(messages_table.c.id == message.id.value))
@@ -40,8 +40,9 @@ async def test_save(insert_ticket, message, session, repository):
 
 
 @pytest.mark.asyncio
-async def test_upsert(insert_ticket, message, repository, session):
-    message = message()
+async def test_upsert(inserted_ticket, message, repository, session):
+    ticket = inserted_ticket
+    message = message(ticket=ticket)
     await repository.save(message)
     await session.commit()
     assert message.delivered_at is None
@@ -66,8 +67,10 @@ async def test_upsert(insert_ticket, message, repository, session):
 
 
 @pytest.mark.asyncio
-async def test_get(insert_ticket, message, session, repository):
-    message = message()
+async def test_get(inserted_ticket, message, session, repository):
+    ticket = inserted_ticket
+
+    message = message(ticket=ticket)
     await repository.save(message)
     await session.commit()
 

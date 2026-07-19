@@ -16,7 +16,7 @@ class Message:
             sender_id: UserId,
             sender_type: SenderType,
             message_type: MessageType,
-            text: Text,
+            text: Text | None,
             sent_at: datetime,
             delivered_at: datetime | None = None,
             read_at: datetime | None = None
