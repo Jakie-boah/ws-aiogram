@@ -7,6 +7,7 @@ from src.application.interfaces.postgres.uow import UnitOfWork
 from src.infrastructure.config.config_storage import Config
 from src.infrastructure.postgres.uow import ImplUnitOfWork
 
+
 class PostgresProvider(Provider):
     config = from_context(Config, scope=Scope.APP)
 

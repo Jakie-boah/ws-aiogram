@@ -5,7 +5,6 @@ from src.application.interfaces.postgres.repositories.ticket_repository import P
 from src.application.interfaces.postgres.uow import UnitOfWork
 from src.infrastructure.postgres.repositories.message import ImplPostgresMessageRepository
 from src.infrastructure.postgres.repositories.ticket import ImplPostgresTicketRepository
-from sqlalchemy.exc import SQLAlchemyError
 
 
 class ImplUnitOfWork(UnitOfWork):
@@ -23,12 +22,7 @@ class ImplUnitOfWork(UnitOfWork):
         return self._ticket
 
     async def commit(self) -> None:
-        try:
-            await self._session.commit()
-
-        except SQLAlchemyError:
-            await self.rollback()
-            raise
+        await self._session.commit()
 
     async def rollback(self) -> None:
         await self._session.rollback()

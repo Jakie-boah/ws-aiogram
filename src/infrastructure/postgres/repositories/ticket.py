@@ -42,11 +42,15 @@ class ImplPostgresTicketRepository(PostgresTicketRepository):
             await self._session.execute(stmt)
 
         except IntegrityError as exc:
-            if exc.orig.__cause__.constraint_name == "uq_tickets_active_per_client":
+
+            cause = getattr(exc.orig, "__cause__", None)
+
+            if getattr(cause, "constraint_name", None) == "uq_tickets_active_per_client":
                 raise ActiveTicketAlreadyExistsError(
                     field="ticket", message="Active ticket for this client already exists"
                 )
-            raise IntegrityError from exc
+
+            raise
 
     async def get(self, uid: TicketId) -> Ticket:
         rows = await self._session.execute(

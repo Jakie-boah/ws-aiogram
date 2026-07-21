@@ -8,10 +8,12 @@ from src.application.interfaces.postgres.repositories.ticket_repository import P
 class UnitOfWork(Protocol):
 
     @property
+    @abstractmethod
     def message(self) -> PostgresMessageRepository:
         ...
 
     @property
+    @abstractmethod
     def ticket(self) -> PostgresTicketRepository:
         ...
 
