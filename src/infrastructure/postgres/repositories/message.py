@@ -1,7 +1,7 @@
 from src.application.interfaces.postgres.repositories.message_repository import PostgresMessageRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.domain.entities.message import Message
-from src.domain.values import MessageId
+from src.domain.values import MessageId, TicketId
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from src.infrastructure.postgres.tables import messages_table
 from src.infrastructure.postgres.repositories.mapper import map_message_entity_from_db
@@ -49,3 +49,13 @@ class ImplPostgresMessageRepository(PostgresMessageRepository):
             )
 
         return map_message_entity_from_db(result)
+
+    async def find_undelivered_by_ticket_id(self, *, ticket_id: TicketId) -> list[Message]:
+        stmt = select(messages_table).where(
+            (messages_table.c.ticket_id == ticket_id.value) &
+            (messages_table.c.delivered_at.is_(None))
+        ).order_by(messages_table.c.sent_at.asc())
+
+        rows = await self._session.execute(stmt)
+        result = rows.mappings().all()
+        return [map_message_entity_from_db(row) for row in result] if result else []
