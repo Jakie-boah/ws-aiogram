@@ -3,8 +3,9 @@ from collections.abc import AsyncIterable
 from dishka import Provider, Scope, from_context, provide
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
+from src.application.interfaces.postgres.uow import UnitOfWork
 from src.infrastructure.config.config_storage import Config
-
+from src.infrastructure.postgres.uow import ImplUnitOfWork
 
 class PostgresProvider(Provider):
     config = from_context(Config, scope=Scope.APP)
@@ -34,3 +35,8 @@ class PostgresProvider(Provider):
         session = session_poll()
         yield session
         await session.close()
+
+
+    @provide(scope=Scope.REQUEST)
+    async def get_uow(self, session: AsyncSession) -> UnitOfWork:
+        return ImplUnitOfWork(session)

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from src.infrastructure.postgres.tables import metadata
 
 
-# from src.application.interfaces.postgres.uow import UnitOfWork
+from src.application.interfaces.postgres.uow import UnitOfWork
 
 @pytest_asyncio.fixture(scope="session")
 async def engine(container_app):
@@ -23,6 +23,7 @@ async def setup_db(engine):
 async def session(engine, container):
     yield await container.get(AsyncSession)
 
-# @pytest_asyncio.fixture
-# async def uow(container):
-#     return await container.get(UnitOfWork)
+
+@pytest_asyncio.fixture
+async def uow(container):
+    return await container.get(UnitOfWork)
