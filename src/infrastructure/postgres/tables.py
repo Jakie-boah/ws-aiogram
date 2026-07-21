@@ -1,6 +1,6 @@
 from sqlalchemy import MetaData, Table, Column, UUID, String, BigInteger, TIMESTAMP, CheckConstraint, Index, text, \
     ForeignKey
-from src.domain.values import TicketState, TicketCloseReason
+from src.domain.values import TicketState, TicketCloseReason, SenderType, MessageType
 
 metadata = MetaData()
 
@@ -59,5 +59,24 @@ messages_table = Table(
     Column("sent_at", TIMESTAMP(timezone=True), nullable=False),
     Column("delivered_at", TIMESTAMP(timezone=True), nullable=True),
     Column("read_at", TIMESTAMP(timezone=True), nullable=True),
+
+    CheckConstraint(f"sender_type IN {_enum_values(SenderType)}", name="sender_check"),
+    CheckConstraint(f"message_type IN {_enum_values(MessageType)}", name="message_type_check"),
+
+    CheckConstraint(
+        "delivered_at IS NULL OR sent_at < delivered_at",
+        name="delivered_at_consistency",
+    ),
+
+    CheckConstraint(
+        "read_at IS NULL OR delivered_at <= read_at",
+        name="read_at_consistency",
+    ),
+
+    Index(
+        "ix_messages_undelivered",
+        "ticket_id",
+        postgresql_where=text("delivered_at IS NULL"),
+    )
 
 )
