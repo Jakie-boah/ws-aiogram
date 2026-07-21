@@ -3,13 +3,12 @@ import datetime
 import pytest
 import pytest_asyncio
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 
 from src.domain.entities.ticket import Ticket
 from src.domain.values import AdminId, ClientId, TicketCloseReason, TicketId, TicketState, TicketStatus
 from src.infrastructure.postgres.repositories.ticket import ImplPostgresTicketRepository
 from src.infrastructure.postgres.tables import tickets_table
-from src.application.interfaces.postgres.repositories.errors import EntityNotFoundError
+from src.application.interfaces.postgres.repositories.errors import EntityNotFoundError, ActiveTicketAlreadyExistsError
 
 ADMIN_ID = AdminId(1212)
 CLIENT_A = ClientId(101)
@@ -286,7 +285,7 @@ async def test_second_active_ticket_for_one_client_is_rejected(
     await repository.save(active_ticket(ticket, CLIENT_A))
     await session.commit()
 
-    with pytest.raises(IntegrityError):
+    with pytest.raises(ActiveTicketAlreadyExistsError):
         await repository.save(active_ticket(ticket, CLIENT_A))
 
     await session.rollback()

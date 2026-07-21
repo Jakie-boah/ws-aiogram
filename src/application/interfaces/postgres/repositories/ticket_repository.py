@@ -1,9 +1,9 @@
-from src.application.interfaces.postgres.repositories.base import Repository
-
-from typing import Protocol
-from src.domain.values import TicketId, ClientId
-from src.domain.entities.ticket import Ticket
 from abc import abstractmethod
+from typing import Protocol
+
+from src.application.interfaces.postgres.repositories.base import Repository
+from src.domain.entities.ticket import Ticket
+from src.domain.values import ClientId, TicketId
 
 
 class PostgresTicketRepository(Repository[Ticket, TicketId], Protocol):

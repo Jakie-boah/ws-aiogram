@@ -1,8 +1,20 @@
-from src.domain.entities.ticket import Ticket
-from src.domain.entities.message import Message
 from sqlalchemy import RowMapping
-from src.domain.values import MessageId, UserId, AdminId, ClientId, TicketCloseReason, TicketId, TicketStatus, \
-    TicketState, SenderType, Text, MessageType
+
+from src.domain.entities.message import Message
+from src.domain.entities.ticket import Ticket
+from src.domain.values import (
+    AdminId,
+    ClientId,
+    MessageId,
+    MessageType,
+    SenderType,
+    Text,
+    TicketCloseReason,
+    TicketId,
+    TicketState,
+    TicketStatus,
+    UserId,
+)
 
 
 def map_ticket_entity_from_db(row: RowMapping) -> Ticket:

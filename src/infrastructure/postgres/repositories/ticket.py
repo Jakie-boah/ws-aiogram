@@ -1,14 +1,14 @@
+from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.application.interfaces.postgres.repositories.errors import ActiveTicketAlreadyExistsError, EntityNotFoundError
 from src.application.interfaces.postgres.repositories.ticket_repository import PostgresTicketRepository
 from src.domain.entities.ticket import Ticket
-from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.values import TicketId, ClientId, TicketState
-
-from sqlalchemy.dialects.postgresql import insert as pg_insert
-from src.infrastructure.postgres.tables import tickets_table
-from sqlalchemy import select
+from src.domain.values import ClientId, TicketId, TicketState
 from src.infrastructure.postgres.repositories.mapper import map_ticket_entity_from_db
-
-from src.application.interfaces.postgres.repositories.errors import EntityNotFoundError
+from src.infrastructure.postgres.tables import tickets_table
 
 
 class ImplPostgresTicketRepository(PostgresTicketRepository):
@@ -37,7 +37,16 @@ class ImplPostgresTicketRepository(PostgresTicketRepository):
                 "admin_id": stmt.excluded.admin_id,
             },
         )
-        await self._session.execute(stmt)
+
+        try:
+            await self._session.execute(stmt)
+
+        except IntegrityError as exc:
+            if exc.orig.__cause__.constraint_name == "uq_tickets_active_per_client":
+                raise ActiveTicketAlreadyExistsError(
+                    field="ticket", message="Active ticket for this client already exists"
+                )
+            raise IntegrityError from exc
 
     async def get(self, uid: TicketId) -> Ticket:
         rows = await self._session.execute(

@@ -1,6 +1,6 @@
 from abc import abstractmethod
-from typing import TypeVar
-from typing import Protocol
+from typing import Protocol, TypeVar
+
 
 E = TypeVar("E")
 ID = TypeVar("ID")

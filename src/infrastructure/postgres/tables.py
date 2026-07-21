@@ -1,6 +1,19 @@
-from sqlalchemy import MetaData, Table, Column, UUID, String, BigInteger, TIMESTAMP, CheckConstraint, Index, text, \
-    ForeignKey
-from src.domain.values import TicketState, TicketCloseReason, SenderType, MessageType
+from sqlalchemy import (
+    TIMESTAMP,
+    UUID,
+    BigInteger,
+    CheckConstraint,
+    Column,
+    ForeignKey,
+    Index,
+    MetaData,
+    String,
+    Table,
+    text,
+)
+
+from src.domain.values import MessageType, SenderType, TicketCloseReason, TicketState
+
 
 metadata = MetaData()
 

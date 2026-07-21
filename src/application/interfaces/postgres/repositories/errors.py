@@ -3,11 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class PostgresRepositoryError(Exception):
-    pass
-
-
-@dataclass
-class EntityNotFoundError(PostgresRepositoryError):
     field: str
     message: str
 
@@ -16,3 +11,13 @@ class EntityNotFoundError(PostgresRepositoryError):
 
     def __repr__(self) -> str:
         return f"{self.field}: {self.message}"
+
+
+@dataclass
+class EntityNotFoundError(PostgresRepositoryError):
+    ...
+
+
+@dataclass
+class ActiveTicketAlreadyExistsError(PostgresRepositoryError):
+    ...

@@ -1,13 +1,13 @@
-from src.application.interfaces.postgres.repositories.message_repository import PostgresMessageRepository
-from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.entities.message import Message
-from src.domain.values import MessageId, TicketId
-from sqlalchemy.dialects.postgresql import insert as pg_insert
-from src.infrastructure.postgres.tables import messages_table
-from src.infrastructure.postgres.repositories.mapper import map_message_entity_from_db
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.interfaces.postgres.repositories.errors import EntityNotFoundError
+from src.application.interfaces.postgres.repositories.message_repository import PostgresMessageRepository
+from src.domain.entities.message import Message
+from src.domain.values import MessageId, TicketId
+from src.infrastructure.postgres.repositories.mapper import map_message_entity_from_db
+from src.infrastructure.postgres.tables import messages_table
 
 
 class ImplPostgresMessageRepository(PostgresMessageRepository):
@@ -27,7 +27,7 @@ class ImplPostgresMessageRepository(PostgresMessageRepository):
             read_at=entity.read_at
         )
         stmt = stmt.on_conflict_do_update(
-            index_elements=['id'],
+            index_elements=["id"],
             set_={
                 "text": stmt.excluded.text,
                 "delivered_at": stmt.excluded.delivered_at,

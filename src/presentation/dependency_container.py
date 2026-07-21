@@ -4,12 +4,12 @@ from src.infrastructure.config.config_storage import Config
 from src.infrastructure.ioc_container import (
     AioHttpProvider,
     LoggerProvider,
+    PostgresProvider,
     RabbitProvider,
     RedisProvider,
     TgProvider,
     UseCasesProvider,
     WSProvider,
-    PostgresProvider,
 )
 
 

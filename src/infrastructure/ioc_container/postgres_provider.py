@@ -1,8 +1,9 @@
-from dishka import Provider, Scope, provide, from_context
+from collections.abc import AsyncIterable
+
+from dishka import Provider, Scope, from_context, provide
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from src.infrastructure.config.config_storage import Config
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessionmaker, AsyncSession
-from typing import AsyncIterable
 
 
 class PostgresProvider(Provider):
