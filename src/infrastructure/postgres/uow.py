@@ -1,3 +1,6 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.interfaces.postgres.repositories.message_repository import PostgresMessageRepository
@@ -20,6 +23,11 @@ class ImplUnitOfWork(UnitOfWork):
     @property
     def ticket(self) -> PostgresTicketRepository:
         return self._ticket
+
+    @asynccontextmanager
+    async def savepoint(self) -> AsyncIterator[None]:
+        async with self._session.begin_nested():
+            yield
 
     async def commit(self) -> None:
         await self._session.commit()

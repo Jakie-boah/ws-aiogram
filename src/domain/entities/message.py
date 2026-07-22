@@ -52,7 +52,7 @@ class Message:
         return self._sender_type
 
     @property
-    def text(self) -> Text:
+    def text(self) -> Text | None:
         return self._text
 
     @property
