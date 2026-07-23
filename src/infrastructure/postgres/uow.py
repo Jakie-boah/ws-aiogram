@@ -1,6 +1,3 @@
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.interfaces.postgres.repositories.message_repository import PostgresMessageRepository
@@ -8,6 +5,8 @@ from src.application.interfaces.postgres.repositories.ticket_repository import P
 from src.application.interfaces.postgres.uow import UnitOfWork
 from src.infrastructure.postgres.repositories.message import ImplPostgresMessageRepository
 from src.infrastructure.postgres.repositories.ticket import ImplPostgresTicketRepository
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
 
 class ImplUnitOfWork(UnitOfWork):

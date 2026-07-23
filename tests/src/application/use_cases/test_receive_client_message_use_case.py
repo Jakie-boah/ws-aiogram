@@ -14,7 +14,6 @@ from src.domain.values import ClientId, MessageType, TicketCloseReason, TicketSt
 from src.infrastructure.postgres.repositories.ticket import ImplPostgresTicketRepository
 from src.infrastructure.postgres.tables import messages_table, tickets_table
 
-
 CLIENT = ClientId(777)
 OTHER_CLIENT = ClientId(888)
 MINUTE = datetime.timedelta(minutes=1)
@@ -222,3 +221,11 @@ async def test_race_lost_and_winner_closed_reraises(use_case, uow, competitor):
         await use_case(dto())
 
 
+@pytest_asyncio.fixture
+async def use_case_di(container):
+    return await container.get(ReceiveClientMessageUseCase)
+
+
+@pytest.mark.asyncio
+async def test_use_case_from_di(use_case_di):
+    await use_case_di(dto())
