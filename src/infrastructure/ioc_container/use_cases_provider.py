@@ -5,6 +5,7 @@ from src.application.use_cases.client_message_use_case import ClientMessageUseCa
 from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
 from src.application.use_cases.publish_client_message_use_case import PublishClientMessageUseCase
 from src.application.use_cases.receive_client_message_use_case import ReceiveClientMessageUseCase
+from src.application.use_cases.receive_admin_message_use_case import ReceiveAdminMessageUseCase
 
 
 class UseCasesProvider(Provider):
@@ -15,3 +16,4 @@ class UseCasesProvider(Provider):
     publish_admin_message_use_case = provide(PublishAdminMessageUseCase, scope=Scope.SESSION)
 
     receive_client_message_use_case = provide(ReceiveClientMessageUseCase, scope=Scope.REQUEST)
+    receive_admin_message_use_case = provide(ReceiveAdminMessageUseCase, scope=Scope.REQUEST)

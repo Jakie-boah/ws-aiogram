@@ -1,4 +1,4 @@
-from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.admin_message import AdminMessageDTOV0
 from src.application.dto.client_message import ClientMessageDTO
 from src.domain.entities.admin_message import AdminMessage
 from src.domain.entities.client_message import ClientMessage
@@ -12,7 +12,7 @@ def map_client_message_from_dto(payload: ClientMessageDTO) -> ClientMessage:
     )
 
 
-def map_admin_message_from_dto(payload: AdminMessageDTO):
+def map_admin_message_from_dto(payload: AdminMessageDTOV0):
     return AdminMessage(
         message_id=MessageIdInt(payload.message_id),
         text=Text(payload.text)

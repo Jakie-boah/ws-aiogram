@@ -1,7 +1,7 @@
 import pytest
 import pytest_asyncio
 from src.application.use_cases.admin_message_use_case import AdminMessageUseCase
-from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.admin_message import AdminMessageDTOV0
 from faker import Faker
 from src.application.interfaces.redis.storage import RedisStorage
 from src.domain.values import MessageIdInt, UserId
@@ -28,7 +28,7 @@ async def test_admin_message_use_case(use_case, redis_storage):
         UserId(fake.pyint(min_value=1, max_value=10000))
     )
 
-    payload = AdminMessageDTO(
+    payload = AdminMessageDTOV0(
         message_id=message_id,
         text=fake.text(max_nb_chars=200)
     )

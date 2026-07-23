@@ -1,6 +1,6 @@
 import structlog
 
-from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.admin_message import AdminMessageDTOV0
 from src.application.interfaces.redis.storage import RedisStorage
 from src.application.interfaces.ws.gateway import WSGatewayAPI
 from src.domain.entities.admin_message import AdminMessage
@@ -19,7 +19,7 @@ class AdminMessageUseCase:
         self._redis_storage = redis_storage
         self._ws_gateway = ws_gateway
 
-    async def __call__(self, payload: AdminMessageDTO):
+    async def __call__(self, payload: AdminMessageDTOV0):
         admin_message: AdminMessage = map_admin_message_from_dto(payload)
         user_id: UserId = await self._redis_storage.get(admin_message.message_id)
         await self._ws_gateway.notify_client(

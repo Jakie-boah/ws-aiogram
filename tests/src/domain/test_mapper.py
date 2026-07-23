@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.admin_message import AdminMessageDTOV0
 from src.application.dto.client_message import ClientMessageDTO
 from src.domain.errors import values as errors
 from src.domain.entities.admin_message import AdminMessage
@@ -29,7 +29,7 @@ def test_map_client_message_from_dto_invalid_user_id():
 
 
 def test_map_admin_message_from_dto():
-    dto = AdminMessageDTO(message_id=fake.pyint(min_value=1, max_value=999999), text=fake.text())
+    dto = AdminMessageDTOV0(message_id=fake.pyint(min_value=1, max_value=999999), text=fake.text())
 
     result = map_admin_message_from_dto(dto)
 
@@ -39,7 +39,7 @@ def test_map_admin_message_from_dto():
 
 
 def test_map_admin_message_from_dto_invalid_message_id():
-    dto = AdminMessageDTO(message_id=0, text=fake.text())
+    dto = AdminMessageDTOV0(message_id=0, text=fake.text())
 
     with pytest.raises(errors.MessageIdValidationError):
         map_admin_message_from_dto(dto)

@@ -8,7 +8,7 @@ from faststream.rabbit import (
 )
 from faststream.rabbit.schemas import Channel
 
-from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.admin_message import AdminMessageDTOV0
 from src.application.dto.client_message import ClientMessageDTO
 from src.application.use_cases.admin_message_use_case import AdminMessageUseCase
 from src.application.use_cases.client_message_use_case import ClientMessageUseCase
@@ -49,7 +49,7 @@ async def client_message_consumer(
 )
 @inject
 async def admin_message_consumer(
-        payload: AdminMessageDTO,
+        payload: AdminMessageDTOV0,
         use_case: FromDishka[AdminMessageUseCase]
 ):
     await use_case(payload)

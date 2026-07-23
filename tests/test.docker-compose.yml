@@ -67,7 +67,7 @@ services:
       - .env.test
 
     command: >
-      sh -c "uv run pytest tests/src/application/use_cases/test_receive_client_message_use_case.py"
+      sh -c "uv run pytest tests/src/application/use_cases/test_receive_admin_message_use_case.py"
 
     depends_on:
       test-rabbit:

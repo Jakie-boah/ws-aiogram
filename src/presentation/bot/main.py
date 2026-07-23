@@ -11,7 +11,7 @@ from dishka.integrations.aiogram import (
     setup_dishka,
 )
 
-from src.application.dto.admin_message import AdminMessageDTO
+from src.application.dto.admin_message import AdminMessageDTOV0
 from src.application.use_cases.publish_admin_message_use_case import PublishAdminMessageUseCase
 from src.infrastructure.config.config_loader import load_config_from_env
 from src.presentation.dependency_container import create_container
@@ -34,7 +34,7 @@ async def echo_handler(
     try:
         await message.answer(message.text)
 
-        payload = AdminMessageDTO(
+        payload = AdminMessageDTOV0(
             message_id=message.reply_to_message.message_id,
             text=message.text
         )
